@@ -3,38 +3,75 @@ import { findTargetBySlug } from './targets.js';
 
 const params = new URLSearchParams(window.location.search);
 const target = findTargetBySlug(params.get('target'));
-const detailRoot = document.querySelector('#detail-root');
+const root = document.querySelector('#detail-root');
 
 if (target) {
-  document.title = `${target.title} | AR 오브제 설명`;
-  renderTargetDetail(target);
+  document.title = `${target.title} | 비상수련회 AR`;
+  renderDetail(target);
 } else {
   renderNotFound();
 }
 
-function renderTargetDetail(targetDetail) {
-  detailRoot.innerHTML = `
-    <a class="back-link" href="/">AR 화면으로 돌아가기</a>
+function renderDetail(t) {
+  const foundRaw = localStorage.getItem('upper-room-ar-found');
+  const foundSet = new Set(foundRaw ? JSON.parse(foundRaw) : []);
+  const foundCount = foundSet.size;
+
+  root.innerHTML = `
+    <a class="back-link" href="/">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      AR 화면으로 돌아가기
+    </a>
     <article class="detail-card">
-      <p class="eyebrow">AR OBJECT ${targetDetail.index + 1}</p>
-      <h1>${targetDetail.title}</h1>
-      <p class="detail-title">${targetDetail.detailTitle}</p>
-      <p class="detail-copy">${targetDetail.detail}</p>
+      <div class="detail-eyebrow">AR OBJECT ${t.num}</div>
+      <h1 class="detail-title">${t.title}</h1>
+      <p class="detail-en">${t.en}</p>
+      <p class="detail-sub-title">${t.detailTitle}</p>
+      <p class="detail-copy">${t.detail}</p>
+
+      <div class="detail-audio">
+        <button class="detail-audio-play" aria-label="묵상 가이드 재생">▶</button>
+        <div class="detail-audio-info">
+          <div class="detail-audio-label">묵상 가이드</div>
+          <div class="detail-audio-meta">2 MIN · 준비 중</div>
+        </div>
+        <div class="detail-audio-dur">02:00</div>
+      </div>
+
+      <div class="detail-reflection">
+        <div class="detail-reflection-label">REFLECTION</div>
+        <p class="detail-reflection-text">${t.reflection}</p>
+      </div>
+
       <blockquote>
-        <p>${targetDetail.verse}</p>
-        <cite>${targetDetail.verseRef}</cite>
+        <p>${t.verse}</p>
+        <cite>${t.verseRef}</cite>
       </blockquote>
     </article>
+
+    <div class="detail-actions">
+      <a class="detail-btn-primary" href="/">
+        ${foundCount >= 4 ? '완성된 다락방 보기' : `다음 표식 찾기 (${foundCount}/4)`}
+      </a>
+      <a class="detail-btn-ghost" href="/">AR 화면으로 돌아가기</a>
+    </div>
   `;
 }
 
 function renderNotFound() {
   document.title = '오브제를 찾을 수 없어요';
-  detailRoot.innerHTML = `
-    <a class="back-link" href="/">AR 화면으로 돌아가기</a>
+  root.innerHTML = `
+    <a class="back-link" href="/">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      AR 화면으로 돌아가기
+    </a>
     <article class="detail-card">
-      <p class="eyebrow">AR OBJECT</p>
-      <h1>오브제를 찾을 수 없어요</h1>
+      <div class="detail-eyebrow">AR OBJECT</div>
+      <h1 class="detail-title">오브제를 찾을 수 없어요</h1>
       <p class="detail-copy">다시 AR 화면에서 발견한 오브제를 눌러주세요.</p>
     </article>
   `;
