@@ -1,27 +1,5 @@
 import './styles.css';
-
-const targets = [
-  {
-    index: 0,
-    title: '빛의 문',
-    message: '첫 번째 AR 조각을 발견했어요. 하나님이 여시는 길을 기억하세요.',
-  },
-  {
-    index: 1,
-    title: '말씀의 검',
-    message: '두 번째 AR 조각을 발견했어요. 말씀으로 다시 일어서는 시간입니다.',
-  },
-  {
-    index: 2,
-    title: '기도의 불씨',
-    message: '세 번째 AR 조각을 발견했어요. 작은 기도가 큰 불씨가 됩니다.',
-  },
-  {
-    index: 3,
-    title: '비상의 깃발',
-    message: '네 번째 AR 조각을 발견했어요. 이제 함께 비상할 준비가 됐습니다.',
-  },
-];
+import { targets } from './targets.js';
 
 const storageKey = 'upper-room-ar-found-targets';
 const scene = document.querySelector('#ar-scene');
@@ -43,6 +21,7 @@ function bindStartButton() {
 
     try {
       await scene.systems['mindar-image-system'].start();
+      document.body.classList.add('is-ar-running');
       startButton.classList.add('is-hidden');
     } catch (error) {
       console.error(error);
@@ -64,8 +43,18 @@ function bindTargetEvents() {
         syncProgress();
       }
 
-      showMessage(`${target.title}: ${target.message}`);
+      showMessage(`${target.title}: ${target.message} 오브제를 누르면 자세히 볼 수 있어요.`);
       navigator.vibrate?.(80);
+    });
+
+    entity.querySelectorAll('.clickable').forEach((clickableObject) => {
+      clickableObject.addEventListener('click', () => {
+        window.location.href = `/detail.html?target=${target.slug}`;
+      });
+    });
+
+    entity.addEventListener('click', () => {
+      window.location.href = `/detail.html?target=${target.slug}`;
     });
 
     entity.addEventListener('targetLost', () => {

@@ -29,10 +29,12 @@
         </ol>
       </section>
 
+      <p class="tap-hint">AR 오브제를 누르면 자세한 설명을 볼 수 있어요.</p>
+
       <div id="scanning-overlay">
         <div class="scanner-card">
           <div class="scanner-frame" aria-hidden="true"></div>
-          <p>오브제에 숨겨진 이미지를 화면 중앙에 맞춰주세요.</p>
+          <p>카메라 화면 중앙에 숨겨진 이미지를 맞춰주세요.</p>
         </div>
       </div>
 
@@ -48,33 +50,35 @@
       renderer="colorManagement: true, physicallyCorrectLights"
       vr-mode-ui="enabled: false"
       device-orientation-permission-ui="enabled: false"
+      cursor="rayOrigin: mouse; fuse: false"
+      raycaster="objects: .clickable"
       embedded
     >
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
       <a-entity id="target-light-gate" mindar-image-target="targetIndex: 0" data-target-index="0">
-        <a-ring position="0 0 0" radius-inner="0.38" radius-outer="0.5" color="#facc15" rotation="0 0 0" animation="property: rotation; to: 0 0 360; loop: true; dur: 6000"></a-ring>
-        <a-torus position="0 0 0.08" radius="0.28" radius-tubular="0.018" color="#38bdf8" animation="property: rotation; to: 360 0 0; loop: true; dur: 4200"></a-torus>
-        <a-text value="빛의 문" align="center" position="0 -0.58 0.05" width="1.8" color="#ffffff"></a-text>
+        <a-ring class="clickable" position="0 0 0" radius-inner="0.38" radius-outer="0.5" color="#facc15" rotation="0 0 0" animation="property: rotation; to: 0 0 360; loop: true; dur: 6000"></a-ring>
+        <a-torus class="clickable" position="0 0 0.08" radius="0.28" radius-tubular="0.018" color="#38bdf8" animation="property: rotation; to: 360 0 0; loop: true; dur: 4200"></a-torus>
+        <a-text class="clickable" value="빛의 문" align="center" position="0 -0.58 0.05" width="1.8" color="#ffffff"></a-text>
       </a-entity>
 
       <a-entity id="target-word-sword" mindar-image-target="targetIndex: 1" data-target-index="1">
-        <a-box position="0 0.04 0.04" depth="0.06" height="0.58" width="0.1" color="#e0f2fe" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000"></a-box>
-        <a-cone position="0 0.42 0.04" radius-bottom="0.11" height="0.22" color="#f8fafc"></a-cone>
-        <a-box position="0 -0.22 0.04" depth="0.07" height="0.08" width="0.38" color="#f59e0b"></a-box>
-        <a-text value="말씀의 검" align="center" position="0 -0.58 0.05" width="1.8" color="#ffffff"></a-text>
+        <a-box class="clickable" position="0 0.04 0.04" depth="0.06" height="0.58" width="0.1" color="#e0f2fe" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000"></a-box>
+        <a-cone class="clickable" position="0 0.42 0.04" radius-bottom="0.11" height="0.22" color="#f8fafc"></a-cone>
+        <a-box class="clickable" position="0 -0.22 0.04" depth="0.07" height="0.08" width="0.38" color="#f59e0b"></a-box>
+        <a-text class="clickable" value="말씀의 검" align="center" position="0 -0.58 0.05" width="1.8" color="#ffffff"></a-text>
       </a-entity>
 
       <a-entity id="target-prayer-flame" mindar-image-target="targetIndex: 2" data-target-index="2">
-        <a-cone position="0 0.02 0.05" radius-bottom="0.22" height="0.48" color="#fb7185" animation="property: scale; dir: alternate; to: 1.18 1.18 1.18; loop: true; dur: 850"></a-cone>
-        <a-cone position="0 0.04 0.1" radius-bottom="0.13" height="0.34" color="#fbbf24" animation="property: scale; dir: alternate; to: 0.9 1.25 0.9; loop: true; dur: 700"></a-cone>
-        <a-text value="기도의 불씨" align="center" position="0 -0.58 0.05" width="1.8" color="#ffffff"></a-text>
+        <a-cone class="clickable" position="0 0.02 0.05" radius-bottom="0.22" height="0.48" color="#fb7185" animation="property: scale; dir: alternate; to: 1.18 1.18 1.18; loop: true; dur: 850"></a-cone>
+        <a-cone class="clickable" position="0 0.04 0.1" radius-bottom="0.13" height="0.34" color="#fbbf24" animation="property: scale; dir: alternate; to: 0.9 1.25 0.9; loop: true; dur: 700"></a-cone>
+        <a-text class="clickable" value="기도의 불씨" align="center" position="0 -0.58 0.05" width="1.8" color="#ffffff"></a-text>
       </a-entity>
 
       <a-entity id="target-rising-flag" mindar-image-target="targetIndex: 3" data-target-index="3">
-        <a-cylinder position="-0.18 0 0.04" radius="0.025" height="0.72" color="#cbd5e1"></a-cylinder>
-        <a-plane position="0.08 0.18 0.04" width="0.48" height="0.28" color="#60a5fa" animation="property: rotation; dir: alternate; to: 0 12 0; loop: true; dur: 1200"></a-plane>
-        <a-text value="비상의 깃발" align="center" position="0 -0.58 0.05" width="1.8" color="#ffffff"></a-text>
+        <a-cylinder class="clickable" position="-0.18 0 0.04" radius="0.025" height="0.72" color="#cbd5e1"></a-cylinder>
+        <a-plane class="clickable" position="0.08 0.18 0.04" width="0.48" height="0.28" color="#60a5fa" animation="property: rotation; dir: alternate; to: 0 12 0; loop: true; dur: 1200"></a-plane>
+        <a-text class="clickable" value="비상의 깃발" align="center" position="0 -0.58 0.05" width="1.8" color="#ffffff"></a-text>
       </a-entity>
     </a-scene>
 
