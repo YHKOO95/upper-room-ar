@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#050816" />
+    <title>2026 여호수아 비상수련회 AR 컨텐츠</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+  </head>
+  <body>
+    <div id="app-shell">
+      <header class="top-panel">
+        <p class="eyebrow">UPPER ROOM AR</p>
+        <h1>2026 여호수아 비상수련회 AR 컨텐츠</h1>
+        <p class="description">숨겨진 4개의 오브제를 카메라로 비추고 AR 조각을 모아보세요.</p>
+      </header>
+
+      <section class="progress-panel" aria-label="AR 오브제 발견 현황">
+        <div class="progress-summary">
+          <span>발견한 오브제</span>
+          <strong><span id="found-count">0</span>/4</strong>
+        </div>
+        <ol class="target-list">
+          <li data-target-status="0">빛의 문</li>
+          <li data-target-status="1">말씀의 검</li>
+          <li data-target-status="2">기도의 불씨</li>
+          <li data-target-status="3">비상의 깃발</li>
+        </ol>
+      </section>
+
+      <div id="scanning-overlay">
+        <div class="scanner-card">
+          <div class="scanner-frame" aria-hidden="true"></div>
+          <p>오브제에 숨겨진 이미지를 화면 중앙에 맞춰주세요.</p>
+        </div>
+      </div>
+
+      <div id="target-message" role="status" aria-live="polite"></div>
+
+      <button id="start-button" type="button">AR 시작하기</button>
+    </div>
+
+    <a-scene
+      id="ar-scene"
+      mindar-image="imageTargetSrc: /targets/upper-room-targets.mind; maxTrack: 4; autoStart: false; uiScanning: #scanning-overlay; filterMinCF: 0.0001; filterBeta: 0.001"
+      color-space="sRGB"
+      renderer="colorManagement: true, physicallyCorrectLights"
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false"
+      embedded
+    >
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+      <a-entity id="target-light-gate" mindar-image-target="targetIndex: 0" data-target-index="0">
+        <a-ring position="0 0 0" radius-inner="0.38" radius-outer="0.5" color="#facc15" rotation="0 0 0" animation="property: rotation; to: 0 0 360; loop: true; dur: 6000"></a-ring>
+        <a-torus position="0 0 0.08" radius="0.28" radius-tubular="0.018" color="#38bdf8" animation="property: rotation; to: 360 0 0; loop: true; dur: 4200"></a-torus>
+        <a-text value="빛의 문" align="center" position="0 -0.58 0.05" width="1.8" color="#ffffff"></a-text>
+      </a-entity>
+
+      <a-entity id="target-word-sword" mindar-image-target="targetIndex: 1" data-target-index="1">
+        <a-box position="0 0.04 0.04" depth="0.06" height="0.58" width="0.1" color="#e0f2fe" animation="property: rotation; to: 0 360 0; loop: true; dur: 5000"></a-box>
+        <a-cone position="0 0.42 0.04" radius-bottom="0.11" height="0.22" color="#f8fafc"></a-cone>
+        <a-box position="0 -0.22 0.04" depth="0.07" height="0.08" width="0.38" color="#f59e0b"></a-box>
+        <a-text value="말씀의 검" align="center" position="0 -0.58 0.05" width="1.8" color="#ffffff"></a-text>
+      </a-entity>
+
+      <a-entity id="target-prayer-flame" mindar-image-target="targetIndex: 2" data-target-index="2">
+        <a-cone position="0 0.02 0.05" radius-bottom="0.22" height="0.48" color="#fb7185" animation="property: scale; dir: alternate; to: 1.18 1.18 1.18; loop: true; dur: 850"></a-cone>
+        <a-cone position="0 0.04 0.1" radius-bottom="0.13" height="0.34" color="#fbbf24" animation="property: scale; dir: alternate; to: 0.9 1.25 0.9; loop: true; dur: 700"></a-cone>
+        <a-text value="기도의 불씨" align="center" position="0 -0.58 0.05" width="1.8" color="#ffffff"></a-text>
+      </a-entity>
+
+      <a-entity id="target-rising-flag" mindar-image-target="targetIndex: 3" data-target-index="3">
+        <a-cylinder position="-0.18 0 0.04" radius="0.025" height="0.72" color="#cbd5e1"></a-cylinder>
+        <a-plane position="0.08 0.18 0.04" width="0.48" height="0.28" color="#60a5fa" animation="property: rotation; dir: alternate; to: 0 12 0; loop: true; dur: 1200"></a-plane>
+        <a-text value="비상의 깃발" align="center" position="0 -0.58 0.05" width="1.8" color="#ffffff"></a-text>
+      </a-entity>
+    </a-scene>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

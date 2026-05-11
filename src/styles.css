@@ -1,0 +1,233 @@
+:root {
+  color: #f8fafc;
+  background: #050816;
+  font-family:
+    Pretendard,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(59, 130, 246, 0.4), transparent 36rem),
+    linear-gradient(135deg, #050816 0%, #111827 48%, #1e1b4b 100%);
+}
+
+#app-shell {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.top-panel,
+.progress-panel,
+#target-message,
+#start-button {
+  pointer-events: auto;
+}
+
+.top-panel {
+  position: fixed;
+  top: max(1rem, env(safe-area-inset-top));
+  left: 1rem;
+  right: 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 1.25rem;
+  background: rgba(15, 23, 42, 0.72);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.28);
+}
+
+.eyebrow {
+  margin: 0 0 0.35rem;
+  color: #93c5fd;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(1.25rem, 5vw, 2rem);
+  line-height: 1.2;
+}
+
+.description {
+  margin: 0.5rem 0 0;
+  color: #cbd5e1;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.progress-panel {
+  position: fixed;
+  right: 1rem;
+  bottom: calc(6.25rem + env(safe-area-inset-bottom));
+  left: 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 1.2rem;
+  background: rgba(2, 6, 23, 0.76);
+  backdrop-filter: blur(18px);
+}
+
+.progress-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #e2e8f0;
+  font-size: 0.92rem;
+}
+
+.progress-summary strong {
+  color: #facc15;
+  font-size: 1.15rem;
+}
+
+.target-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0.85rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.target-list li {
+  padding: 0.58rem 0.7rem;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 999px;
+  color: #94a3b8;
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+.target-list li::before {
+  content: "숨김";
+  display: inline-block;
+  margin-right: 0.35rem;
+  color: #64748b;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.target-list li.is-found {
+  border-color: rgba(250, 204, 21, 0.55);
+  color: #fef3c7;
+  background: rgba(250, 204, 21, 0.12);
+}
+
+.target-list li.is-found::before {
+  content: "발견";
+  color: #facc15;
+}
+
+#scanning-overlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  z-index: 20;
+  padding: 1rem;
+  background: rgba(2, 6, 23, 0.35);
+  pointer-events: none;
+}
+
+.scanner-card {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  width: min(21rem, 86vw);
+  color: #e2e8f0;
+  text-align: center;
+  text-shadow: 0 0.1rem 0.5rem rgba(0, 0, 0, 0.8);
+}
+
+.scanner-frame {
+  width: min(17rem, 72vw);
+  aspect-ratio: 1;
+  border: 0.18rem solid rgba(250, 204, 21, 0.9);
+  border-radius: 1.6rem;
+  box-shadow:
+    0 0 0 999rem rgba(2, 6, 23, 0.28),
+    0 0 2.2rem rgba(250, 204, 21, 0.38);
+}
+
+.scanner-card p {
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+#target-message {
+  position: fixed;
+  right: 1rem;
+  bottom: calc(14.5rem + env(safe-area-inset-bottom));
+  left: 1rem;
+  z-index: 30;
+  transform: translateY(0.75rem);
+  padding: 0.9rem 1rem;
+  border-radius: 1rem;
+  color: #0f172a;
+  background: #fef3c7;
+  font-weight: 800;
+  line-height: 1.45;
+  opacity: 0;
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+  pointer-events: none;
+}
+
+#target-message.is-visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+#start-button {
+  position: fixed;
+  right: 1rem;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  left: 1rem;
+  z-index: 40;
+  min-height: 3.75rem;
+  border: 0;
+  border-radius: 999px;
+  color: #0f172a;
+  background: linear-gradient(135deg, #facc15, #f97316);
+  box-shadow: 0 1rem 2.5rem rgba(249, 115, 22, 0.35);
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+#start-button:disabled {
+  cursor: wait;
+  opacity: 0.8;
+}
+
+#start-button.is-hidden {
+  display: none;
+}
+
+a-scene {
+  width: 100vw;
+  height: 100vh;
+}
