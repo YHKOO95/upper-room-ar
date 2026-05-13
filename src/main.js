@@ -5,10 +5,10 @@ import { targets } from './targets.js';
 const STORAGE_KEY = 'upper-room-ar-found';
 const HOLD_MS = 1500;
 const PROMPTS = [
-  '매일 아침, 창문을 연다',
-  '두려운 자리에서도 무릎을 꿇는다',
-  '하루 세 번, 멈추어 기도한다',
-  '익숙한 자리를 다시 사랑한다',
+  '매일 아침, 창문을 열고 무릎을 꿇는다',
+  '두려운 자리에서도 하나님을 선택한다',
+  '기도를 시작하는 그 순간, 하늘이 움직인다',
+  '지혜로운 자는 별처럼 영원토록 빛난다',
 ];
 const CAMERA_IDEAL_WIDTH = 1280;
 const CAMERA_IDEAL_HEIGHT = 720;
@@ -631,14 +631,14 @@ function buildCommCard({ sealed = false, litCount = 4, serial = '' } = {}) {
       <div class="card-verse-area">
         <div class="card-res-label">MY RESOLUTION</div>
         <div class="card-res-text">"${resolution}"</div>
-        <div class="card-daniel-ref">REVELATION 3:8</div>
+        <div class="card-daniel-ref">DANIEL 9:23</div>
       </div>
     `);
   } else {
     divider.insertAdjacentHTML('beforeend', `
       <div class="card-verse-area">
         <div class="card-verse-text">"네 자리에서 켜진 빛이<br>다락방에 모였습니다"</div>
-        <div class="card-verse-ref-lbl">REVELATION 3:8</div>
+        <div class="card-verse-ref-lbl">DANIEL 9:23</div>
       </div>
     `);
   }
@@ -691,29 +691,39 @@ function stationGlyphSVG(kind, size = 64, glow = false) {
   const s = size;
   const common = `width="${s}" height="${s}" viewBox="0 0 64 64" fill="none"`;
   switch (kind) {
-    case 'gate':
+    case 'window':
       return `<svg ${common}>
-        <path d="M10 56 L10 30 Q10 12 32 12 Q54 12 54 30 L54 56" stroke="${w}" stroke-width="1.2"/>
-        <rect x="26" y="34" width="12" height="22" fill="${c}" opacity="${glow ? 0.7 : 0.4}"/>
-        ${glow ? `<rect x="26" y="34" width="12" height="22" fill="${c}" style="filter:blur(6px);opacity:0.5"/>` : ''}
-        <line x1="32" y1="12" x2="32" y2="56" stroke="${w}" stroke-width="0.8" stroke-dasharray="3 3"/>
+        <rect x="12" y="14" width="40" height="36" rx="2" stroke="${w}" stroke-width="1.2" fill="rgba(255,255,255,0.04)"/>
+        <line x1="32" y1="14" x2="32" y2="50" stroke="${w}" stroke-width="0.8"/>
+        <line x1="12" y1="32" x2="52" y2="32" stroke="${w}" stroke-width="0.8"/>
+        ${glow ? `<rect x="13" y="15" width="18" height="16" fill="${c}" opacity="0.18"/><rect x="33" y="15" width="18" height="16" fill="${c}" opacity="0.18"/><rect x="13" y="33" width="18" height="16" fill="${c}" opacity="0.10"/><rect x="33" y="33" width="18" height="16" fill="${c}" opacity="0.10"/>` : ''}
+        <line x1="8" y1="50" x2="56" y2="50" stroke="${w}" stroke-width="1.2" stroke-linecap="round"/>
       </svg>`;
-    case 'sword':
+    case 'book':
       return `<svg ${common}>
-        <path d="M32 10 L27 50 L32 56 L37 50 Z" stroke="${w}" stroke-width="1.2" fill="rgba(255,255,255,0.08)"/>
-        <line x1="22" y1="42" x2="42" y2="42" stroke="${c}" stroke-width="1.4" stroke-opacity="${glow ? 1 : 0.7}"/>
-        <rect x="30" y="50" width="4" height="8" rx="2" stroke="${w}" stroke-width="1.2"/>
-        ${glow ? `<line x1="32" y1="10" x2="32" y2="42" stroke="${c}" stroke-width="0.6" stroke-opacity="0.4"/>` : ''}
+        <path d="M16 10 Q14 10 14 12 L14 52 Q14 54 16 54 L48 54 Q50 54 50 52 L50 12 Q50 10 48 10 Z" stroke="${w}" stroke-width="1.2" fill="rgba(255,255,255,0.04)"/>
+        <line x1="24" y1="10" x2="24" y2="54" stroke="${w}" stroke-width="0.8"/>
+        <line x1="30" y1="22" x2="44" y2="22" stroke="${w}" stroke-width="0.7" stroke-opacity="0.6"/>
+        <line x1="30" y1="29" x2="44" y2="29" stroke="${w}" stroke-width="0.7" stroke-opacity="0.6"/>
+        <line x1="30" y1="36" x2="44" y2="36" stroke="${w}" stroke-width="0.7" stroke-opacity="0.6"/>
+        ${glow ? `<line x1="37" y1="16" x2="37" y2="42" stroke="${c}" stroke-width="1.4" opacity="0.7"/><line x1="30" y1="28" x2="44" y2="28" stroke="${c}" stroke-width="1.4" opacity="0.7"/>` : ''}
       </svg>`;
-    case 'flame':
+    case 'star':
       return `<svg ${common}>
-        <path d="M32 54 C14 54 14 32 24 22 C26 36 32 30 32 30 C32 30 38 22 46 12 C52 26 50 54 32 54 Z" stroke="${w}" stroke-width="1.2" fill="rgba(251,113,133,0.15)"/>
-        <path d="M32 54 C22 54 22 36 28 28 C30 40 32 34 32 34 C32 34 36 28 40 20 C46 32 44 54 32 54 Z" fill="${glow ? '#fbbf24' : 'rgba(251,191,36,0.3)'}" stroke="none"/>
+        <polygon points="32,9 36.4,22.2 50.5,22.2 39.5,30.3 43.5,43.5 32,35.7 20.5,43.5 24.5,30.3 13.5,22.2 27.6,22.2" stroke="${w}" stroke-width="1.2" fill="${glow ? `rgba(245,194,107,0.25)` : 'rgba(255,255,255,0.05)'}"/>
+        ${glow ? `<polygon points="32,9 36.4,22.2 50.5,22.2 39.5,30.3 43.5,43.5 32,35.7 20.5,43.5 24.5,30.3 13.5,22.2 27.6,22.2" fill="${c}" style="filter:blur(7px);opacity:0.28"/>` : ''}
+        <circle cx="13" cy="18" r="1.4" fill="${w}" opacity="${glow ? 0.9 : 0.4}"/>
+        <circle cx="51" cy="14" r="1" fill="${w}" opacity="${glow ? 0.8 : 0.35}"/>
+        <circle cx="9" cy="46" r="1" fill="${w}" opacity="${glow ? 0.7 : 0.3}"/>
+        <circle cx="53" cy="50" r="1.4" fill="${w}" opacity="${glow ? 0.8 : 0.4}"/>
       </svg>`;
-    case 'flag':
+    case 'lamp':
       return `<svg ${common}>
-        <line x1="18" y1="8" x2="18" y2="58" stroke="${w}" stroke-width="1.4" stroke-linecap="round"/>
-        <path d="M18 14 L48 22 L18 32 Z" stroke="${c}" stroke-width="1.2" fill="${glow ? 'rgba(96,165,250,0.4)' : 'rgba(96,165,250,0.15)'}" stroke-opacity="${glow ? 1 : 0.7}"/>
+        <line x1="32" y1="10" x2="32" y2="22" stroke="${w}" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M20 22 L44 22 L39 46 L25 46 Z" stroke="${w}" stroke-width="1.2" fill="${glow ? `rgba(245,194,107,0.2)` : 'rgba(255,255,255,0.05)'}"/>
+        ${glow ? `<ellipse cx="32" cy="24" rx="13" ry="3.5" fill="${c}" opacity="0.22" style="filter:blur(4px)"/>` : ''}
+        <line x1="25" y1="46" x2="39" y2="46" stroke="${w}" stroke-width="1"/>
+        <circle cx="32" cy="25" r="${glow ? 3.5 : 2.5}" fill="${glow ? c : 'rgba(255,255,255,0.3)'}" stroke="${w}" stroke-width="0.6"/>
       </svg>`;
     default:
       return `<svg ${common}><circle cx="32" cy="32" r="16" stroke="${w}" stroke-width="1.2"/></svg>`;
