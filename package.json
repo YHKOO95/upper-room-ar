@@ -5,17 +5,19 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0",
+    "gen:targets": "node scripts/build-8th-targets.mjs",
+    "prebuild": "npm run gen:targets",
     "build": "vite build",
-    "preview": "vite preview --host 0.0.0.0",
-    "zapworks:upload": "npm run build && node scripts/zapworks-upload.mjs"
+    "preview": "vite preview --host 0.0.0.0"
   },
   "dependencies": {
+    "@8thwall/engine-binary": "^1.0.0",
+    "@8thwall/landing-page": "^1.0.0",
+    "@8thwall/xrextras": "^1.0.0",
     "@vitejs/plugin-basic-ssl": "latest",
-    "@zappar/zappar-aframe": "^3.2.0",
-    "@zappar/zappar-threejs": "^4.3.0",
     "vite": "latest"
   },
   "devDependencies": {
-    "@zappar/zapworks-cli": "^2.3.3"
+    "@8thwall/image-target-cli": "^1.0.0"
   }
 }

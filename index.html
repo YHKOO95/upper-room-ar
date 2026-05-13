@@ -5,14 +5,64 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#000000" />
   <title>2026 여호수아 비상수련회 AR</title>
+  <style>
+    #dev-insecure-context {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      padding: max(16px, env(safe-area-inset-top)) 20px 24px;
+      background: #1a0a0a;
+      color: #fff;
+      font-size: 15px;
+      line-height: 1.55;
+      border: 3px solid #f5c26b;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      font-family: -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif;
+    }
+    #dev-insecure-context[hidden] { display: none !important; }
+    #dev-insecure-context strong {
+      display: block;
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+      color: #ffe8b8;
+    }
+    #dev-insecure-context p { margin-bottom: 12px; color: rgba(255,255,255,0.88); }
+    #dev-insecure-context .dev-insecure-sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 0; }
+    #dev-insecure-context .dev-insecure-code {
+      font-family: ui-monospace, monospace;
+      background: rgba(255,255,255,0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+  </style>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"/>
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@8thwall/xrextras@1/dist/xrextras.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@8thwall/landing-page@1/dist/landing-page.js" crossorigin="anonymous"></script>
+  <!--8THWALL_XR-->
   <script src="https://unpkg.com/html-to-image@1.11.13/dist/html-to-image.js" crossorigin="anonymous"></script>
+  <script>
+    (function () {
+      if (window.isSecureContext) return;
+      window.__upperRoomNeedsHttps = true;
+      document.addEventListener('DOMContentLoaded', function () {
+        var el = document.getElementById('dev-insecure-context');
+        if (el) el.hidden = false;
+      });
+    })();
+  </script>
 </head>
 <body>
+
+<div id="dev-insecure-context" class="dev-insecure-context" hidden>
+  <strong>HTTPS로 접속해 주세요</strong>
+  <p>지금은 HTTP(비보안)라서 카메라·8th Wall 엔진이 시작되지 않습니다. 주소를 <code class="dev-insecure-code">https://</code>로 바꾼 뒤 다시 열어주세요.</p>
+  <p class="dev-insecure-sub">자체 서명 인증서 경고가 나오면 «고급» 또는 «세부 정보»에서 계속 진행하면 됩니다.</p>
+</div>
 
 <div id="app">
 
@@ -224,46 +274,49 @@
 <!-- A-FRAME AR SCENE ──────────────────────────────────────────── -->
 <a-scene
   id="ar-scene"
+  landing-page
+  xrextras-loading
+  xrextras-runtime-error
+  xrextras-gesture-detector
   color-space="sRGB"
   renderer="colorManagement: true; physicallyCorrectLights: true; alpha: true"
   vr-mode-ui="enabled: false"
   device-orientation-permission-ui="enabled: false"
   cursor="rayOrigin: mouse; fuse: false"
-  raycaster="objects: .clickable"
+  raycaster="objects: .clickable, .cantap"
+  xrweb="disableWorldTracking: true"
 >
-  <a-assets>
-    <a-asset-item id="zpt-0" src="./targets/1.zpt"></a-asset-item>
-    <a-asset-item id="zpt-1" src="./targets/2.zpt"></a-asset-item>
-    <a-asset-item id="zpt-2" src="./targets/3.zpt"></a-asset-item>
-  </a-assets>
+  <a-camera
+    id="ar-camera"
+    position="0 0 0"
+    look-controls="enabled: false"
+    raycaster="objects: .clickable, .cantap"
+    cursor="fuse: false; rayOrigin: mouse"
+  ></a-camera>
 
-  <a-entity zappar-compatibility-ui></a-entity>
-
-  <a-entity id="zappar-cam" camera position="0 0 0" look-controls="enabled: false" zappar-camera></a-entity>
-
-  <a-entity id="ar-target-0" zappar-image="target: #zpt-0; enabled: false" data-target-index="0">
+  <xrextras-named-image-target name="station-1" data-target-index="0">
     <a-ring class="clickable" position="0 0 0" radius-inner="0.38" radius-outer="0.5" color="#facc15"
       animation="property: rotation; to: 0 0 360; loop: true; dur: 6000"></a-ring>
     <a-torus class="clickable" position="0 0 0.08" radius="0.28" radius-tubular="0.018" color="#38bdf8"
       animation="property: rotation; to: 360 0 0; loop: true; dur: 4200"></a-torus>
     <a-text value="빛의 문" align="center" position="0 -0.58 0.05" width="1.8" color="#ffffff"></a-text>
-  </a-entity>
+  </xrextras-named-image-target>
 
-  <a-entity id="ar-target-1" zappar-image="target: #zpt-1; enabled: false" data-target-index="1">
+  <xrextras-named-image-target name="station-2" data-target-index="1">
     <a-box class="clickable" position="0 0.04 0.04" depth="0.06" height="0.58" width="0.1" color="#e0f2fe"
       animation="property: rotation; to: 0 360 0; loop: true; dur: 5000"></a-box>
     <a-cone class="clickable" position="0 0.42 0.04" radius-bottom="0.11" height="0.22" color="#f8fafc"></a-cone>
     <a-box class="clickable" position="0 -0.22 0.04" depth="0.07" height="0.08" width="0.38" color="#f59e0b"></a-box>
     <a-text value="말씀의 검" align="center" position="0 -0.58 0.05" width="1.8" color="#ffffff"></a-text>
-  </a-entity>
+  </xrextras-named-image-target>
 
-  <a-entity id="ar-target-2" zappar-image="target: #zpt-2; enabled: false" data-target-index="2">
+  <xrextras-named-image-target name="station-3" data-target-index="2">
     <a-cone class="clickable" position="0 0.02 0.05" radius-bottom="0.22" height="0.48" color="#fb7185"
       animation="property: scale; dir: alternate; to: 1.18 1.18 1.18; loop: true; dur: 850"></a-cone>
     <a-cone class="clickable" position="0 0.04 0.1" radius-bottom="0.13" height="0.34" color="#fbbf24"
       animation="property: scale; dir: alternate; to: 0.9 1.25 0.9; loop: true; dur: 700"></a-cone>
     <a-text value="기도의 불씨" align="center" position="0 -0.58 0.05" width="1.8" color="#ffffff"></a-text>
-  </a-entity>
+  </xrextras-named-image-target>
 
 </a-scene>
 

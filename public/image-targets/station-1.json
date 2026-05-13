@@ -1,0 +1,23 @@
+{
+  "imagePath": "image-targets/station-1_luminance.png",
+  "metadata": null,
+  "name": "station-1",
+  "type": "PLANAR",
+  "properties": {
+    "left": 0,
+    "top": 100,
+    "width": 557,
+    "height": 743,
+    "isRotated": false,
+    "originalWidth": 557,
+    "originalHeight": 943
+  },
+  "resources": {
+    "originalImage": "station-1_original.png",
+    "croppedImage": "station-1_cropped.png",
+    "thumbnailImage": "station-1_thumbnail.png",
+    "luminanceImage": "station-1_luminance.png"
+  },
+  "created": 1778688766974,
+  "updated": 1778688766974
+}

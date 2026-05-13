@@ -1,6 +1,5 @@
 import './styles.css';
-import * as ZapparThree from '@zappar/zappar-threejs';
-import '@zappar/zappar-aframe';
+import { XR8Promise } from '@8thwall/engine-binary';
 import { targets } from './targets.js';
 
 // ── Constants ──────────────────────────────────────────────────
@@ -17,13 +16,6 @@ const PROMPTS = [
   '기도를 시작하는 그 순간, 하늘이 움직인다',
   '지혜로운 자는 별처럼 영원토록 빛난다',
 ];
-const CAMERA_IDEAL_WIDTH = 1280;
-const CAMERA_IDEAL_HEIGHT = 720;
-const CAMERA_IDEAL_FPS = 30;
-
-/** iOS WebGL 합성 이슈 디버그: COI 미적용 시 한 번만 안내 */
-let warnedCoi = false;
-let didLogCoiDiagnostics = false;
 
 // ── DOM helpers ────────────────────────────────────────────────
 const $ = (id) => document.getElementById(id);
@@ -47,23 +39,7 @@ renderHub();
 renderCompleteGlyphs();
 bindButtons();
 bindAREvents();
-
-if (!didLogCoiDiagnostics) {
-  didLogCoiDiagnostics = true;
-  const framed = window.self !== window.top;
-  const coi = typeof crossOriginIsolated !== 'undefined' ? crossOriginIsolated : undefined;
-  console.info('[UpperRoom AR]', { crossOriginIsolated: coi, framed, href: location.href });
-  if (framed) {
-    console.info(
-      '[UpperRoom AR] 개발자도구 콘솔 상단이 "top"이면 부모 페이지 기준입니다. 드롭다운에서 zappar.io iframe을 고른 뒤 crossOriginIsolated 를 다시 입력하세요.',
-    );
-  }
-  if (coi === false) {
-    console.info(
-      '[UpperRoom AR] Network 탭에서 index.html 문서의 Response Headers에 Cross-Origin-Opener-Policy / Cross-Origin-Embedder-Policy 가 있는지 확인하세요. 없으면 호스팅에 COI가 안 붙은 버전일 수 있습니다.',
-    );
-  }
-}
+configureEightWallImageTargets();
 
 window.addEventListener('resize', () => {
   if (scene?.classList?.contains('ar-active')) resizeARScene();
@@ -105,15 +81,8 @@ function bindButtons() {
   // Splash
   $('btn-start').addEventListener('click', () => showScreen('perm'));
 
-  // Permission (Zappar camera + motion — must run above UI; see ensureZapparPermission)
-  $('btn-perm-go').addEventListener('click', async () => {
-    const ok = await ensureZapparPermission();
-    if (!ok) {
-      alert('카메라·모션 접근을 허용해야 AR 표식을 찾을 수 있어요.');
-      return;
-    }
-    showScreen('hub');
-  });
+  // Permission: 카메라는 첫 스캔 시 브라우저·8th Wall 플로우에서 요청됩니다.
+  $('btn-perm-go').addEventListener('click', () => showScreen('hub'));
   $('btn-perm-skip').addEventListener('click', () => showScreen('hub'));
 
   // Hub
@@ -127,7 +96,6 @@ function bindButtons() {
 
   // Scanner back
   $('btn-scan-back').addEventListener('click', () => {
-    stopAR();
     showScreen('hub');
   });
 
@@ -210,44 +178,28 @@ function bindButtons() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// AR / Zappar
+// AR / 8th Wall
 // ─────────────────────────────────────────────────────────────
-async function ensureZapparPermission() {
-  try {
-    await ZapparThree.loadedPromise();
-  } catch (err) {
-    console.error('[Zappar] CV 라이브러리 로드 실패:', err);
-    return false;
-  }
-
-  const sys = scene?.systems?.['zappar-camera'];
-  const camEl = document.querySelector('#zappar-cam');
-  if (!sys || !camEl) return false;
-
-  const startCamera = () => {
-    const userFacing = camEl.components['zappar-camera']?.data?.userFacing ?? false;
-    sys.camera.start(userFacing);
-    const threeScene = scene?.object3D;
-    if (threeScene && sys.camera.backgroundTexture) {
-      threeScene.background = sys.camera.backgroundTexture;
-    }
-    if (!warnedCoi && typeof crossOriginIsolated !== 'undefined' && !crossOriginIsolated) {
-      warnedCoi = true;
-      console.warn(
-        '[Zappar] crossOriginIsolated=false 입니다. ZapWorks 업로드 시 --cross-origin-isolation 이 필요할 수 있어요.',
+async function configureEightWallImageTargets() {
+  const load = async () => {
+    try {
+      const XR8 = await XR8Promise;
+      const base = import.meta.env.BASE_URL ?? './';
+      const jsonData = await Promise.all(
+        targets.map((t) =>
+          fetch(`${base}image-targets/${t.imageTargetName}.json`).then((r) => {
+            if (!r.ok) throw new Error(`${t.imageTargetName}: ${r.status}`);
+            return r.json();
+          }),
+        ),
       );
+      XR8.XrController.configure({ imageTargetData: jsonData });
+    } catch (e) {
+      console.error('[8th Wall] image target configure failed', e);
     }
   };
-
-  if (sys.permissionGranted) {
-    startCamera();
-    return true;
-  }
-
-  const granted = await ZapparThree.permissionRequestUI();
-  sys.permissionGranted = granted;
-  if (granted) startCamera();
-  return granted;
+  if (window.XR8) void load();
+  else window.addEventListener('xrloaded', () => void load(), { once: true });
 }
 
 function resizeARScene() {
@@ -255,17 +207,11 @@ function resizeARScene() {
 }
 
 function bindAREvents() {
-  const cam = document.querySelector('#zappar-cam');
-  if (cam && !cam._zapparTuned) {
-    cam._zapparTuned = true;
-    cam.addEventListener('first-frame', () => tuneCameraQuality(), { once: true });
-  }
-
   targets.forEach((t) => {
     const entity = document.querySelector(`[data-target-index="${t.index}"]`);
     if (!entity) return;
 
-    entity.addEventListener('zappar-visible', () => {
+    entity.addEventListener('xrextrasfound', () => {
       if (!found.has(t.index)) {
         found.add(t.index);
         saveFoundTargets();
@@ -276,7 +222,7 @@ function bindAREvents() {
       navigator.vibrate?.(80);
     });
 
-    entity.addEventListener('zappar-notvisible', () => {
+    entity.addEventListener('xrextraslost', () => {
       if (document.getElementById('s-revealed')?.classList.contains('active')) {
         showScreen('scanner');
       }
@@ -304,83 +250,13 @@ function startScanner() {
     requestAnimationFrame(resizeARScene);
   });
 
-  const run = async () => {
-    const ok = await ensureZapparPermission();
-    if (!ok) {
-      statusPill.textContent = '카메라 권한이 필요해요';
-      return;
-    }
-    setZapparImageTrackersEnabled(true);
+  const run = () => {
     resizeARScene();
-    requestAnimationFrame(() =>
-      requestAnimationFrame(() => {
-        resizeARScene();
-        tuneCameraQuality();
-      }),
-    );
+    requestAnimationFrame(() => requestAnimationFrame(resizeARScene));
   };
 
-  if (scene.hasLoaded) void run();
-  else scene.addEventListener('loaded', () => void run(), { once: true });
-}
-
-async function tuneCameraQuality() {
-  await new Promise((resolve) => requestAnimationFrame(resolve));
-
-  const track = getActiveCameraTrack();
-  if (!track?.applyConstraints) return;
-
-  const constraints = buildCameraQualityConstraints(track);
-  try {
-    await track.applyConstraints(constraints);
-    console.info('Camera settings:', track.getSettings?.());
-  } catch (err) {
-    console.warn('Camera quality constraints were not applied:', err);
-  }
-}
-
-function getActiveCameraTrack() {
-  const videos = [...document.querySelectorAll('video')];
-  for (const video of videos) {
-    const stream = video.srcObject;
-    if (!(stream instanceof MediaStream)) continue;
-    const [track] = stream.getVideoTracks();
-    if (track?.readyState === 'live') return track;
-  }
-  return null;
-}
-
-function buildCameraQualityConstraints(track) {
-  const caps = track.getCapabilities?.() || {};
-  const constraints = {
-    width: { ideal: Math.min(CAMERA_IDEAL_WIDTH, caps.width?.max || CAMERA_IDEAL_WIDTH) },
-    height: { ideal: Math.min(CAMERA_IDEAL_HEIGHT, caps.height?.max || CAMERA_IDEAL_HEIGHT) },
-    frameRate: { ideal: Math.min(CAMERA_IDEAL_FPS, caps.frameRate?.max || CAMERA_IDEAL_FPS) },
-  };
-
-  if (caps.facingMode?.includes('environment')) {
-    constraints.facingMode = { ideal: 'environment' };
-  }
-
-  const advanced = {};
-  if (caps.focusMode?.includes('continuous')) advanced.focusMode = 'continuous';
-  if (caps.exposureMode?.includes('continuous')) advanced.exposureMode = 'continuous';
-  if (caps.whiteBalanceMode?.includes('continuous')) advanced.whiteBalanceMode = 'continuous';
-  if (Object.keys(advanced).length > 0) constraints.advanced = [advanced];
-
-  return constraints;
-}
-
-function setZapparImageTrackersEnabled(on) {
-  targets.forEach((t) => {
-    const el = document.querySelector(`[data-target-index="${t.index}"]`);
-    if (!el) return;
-    el.setAttribute('zappar-image', { target: `#zpt-${t.index}`, enabled: on });
-  });
-}
-
-function stopAR() {
-  setZapparImageTrackersEnabled(false);
+  if (scene.hasLoaded) run();
+  else scene.addEventListener('loaded', () => run(), { once: true });
 }
 
 function showRevealedOverlay(target) {

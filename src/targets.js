@@ -1,6 +1,8 @@
 export const targets = [
   {
     index: 0,
+    /** 8th Wall named image target + generated JSON basename */
+    imageTargetName: 'station-1',
     slug: 'window',
     num: '01',
     title: '기도의 창문',
@@ -17,6 +19,7 @@ export const targets = [
   },
   {
     index: 1,
+    imageTargetName: 'station-2',
     slug: 'bible',
     num: '02',
     title: '하나님의 격려',
@@ -33,6 +36,7 @@ export const targets = [
   },
   {
     index: 2,
+    imageTargetName: 'station-3',
     slug: 'light',
     num: '03',
     title: '하늘의 빛',
