@@ -9,8 +9,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"/>
-  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-  <script src="https://unpkg.com/html-to-image@1.11.13/dist/html-to-image.js"></script>
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/html-to-image@1.11.13/dist/html-to-image.js" crossorigin="anonymous"></script>
 </head>
 <body>
 
@@ -230,7 +230,6 @@
   device-orientation-permission-ui="enabled: false"
   cursor="rayOrigin: mouse; fuse: false"
   raycaster="objects: .clickable"
-  embedded
 >
   <a-assets>
     <a-asset-item id="zpt-0" src="./targets/1.zpt"></a-asset-item>

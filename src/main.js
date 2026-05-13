@@ -1,6 +1,6 @@
 import './styles.css';
-import '@zappar/zappar-aframe';
 import * as ZapparThree from '@zappar/zappar-threejs';
+import '@zappar/zappar-aframe';
 import { targets } from './targets.js';
 
 // ── Constants ──────────────────────────────────────────────────
@@ -20,6 +20,10 @@ const PROMPTS = [
 const CAMERA_IDEAL_WIDTH = 1280;
 const CAMERA_IDEAL_HEIGHT = 720;
 const CAMERA_IDEAL_FPS = 30;
+
+/** iOS WebGL 합성 이슈 디버그: COI 미적용 시 한 번만 안내 */
+let warnedCoi = false;
+let didLogCoiDiagnostics = false;
 
 // ── DOM helpers ────────────────────────────────────────────────
 const $ = (id) => document.getElementById(id);
@@ -43,6 +47,32 @@ renderHub();
 renderCompleteGlyphs();
 bindButtons();
 bindAREvents();
+
+if (!didLogCoiDiagnostics) {
+  didLogCoiDiagnostics = true;
+  const framed = window.self !== window.top;
+  const coi = typeof crossOriginIsolated !== 'undefined' ? crossOriginIsolated : undefined;
+  console.info('[UpperRoom AR]', { crossOriginIsolated: coi, framed, href: location.href });
+  if (framed) {
+    console.info(
+      '[UpperRoom AR] 개발자도구 콘솔 상단이 "top"이면 부모 페이지 기준입니다. 드롭다운에서 zappar.io iframe을 고른 뒤 crossOriginIsolated 를 다시 입력하세요.',
+    );
+  }
+  if (coi === false) {
+    console.info(
+      '[UpperRoom AR] Network 탭에서 index.html 문서의 Response Headers에 Cross-Origin-Opener-Policy / Cross-Origin-Embedder-Policy 가 있는지 확인하세요. 없으면 호스팅에 COI가 안 붙은 버전일 수 있습니다.',
+    );
+  }
+}
+
+window.addEventListener('resize', () => {
+  if (scene?.classList?.contains('ar-active')) resizeARScene();
+});
+window.addEventListener('orientationchange', () => {
+  window.setTimeout(() => {
+    if (scene?.classList?.contains('ar-active')) resizeARScene();
+  }, 400);
+});
 
 const returnScreen = sessionStorage.getItem('upper-room-ar-return');
 if (returnScreen) {
@@ -183,18 +213,45 @@ function bindButtons() {
 // AR / Zappar
 // ─────────────────────────────────────────────────────────────
 async function ensureZapparPermission() {
+  try {
+    await ZapparThree.loadedPromise();
+  } catch (err) {
+    console.error('[Zappar] CV 라이브러리 로드 실패:', err);
+    return false;
+  }
+
   const sys = scene?.systems?.['zappar-camera'];
   const camEl = document.querySelector('#zappar-cam');
   if (!sys || !camEl) return false;
-  if (sys.permissionGranted) return true;
+
+  const startCamera = () => {
+    const userFacing = camEl.components['zappar-camera']?.data?.userFacing ?? false;
+    sys.camera.start(userFacing);
+    const threeScene = scene?.object3D;
+    if (threeScene && sys.camera.backgroundTexture) {
+      threeScene.background = sys.camera.backgroundTexture;
+    }
+    if (!warnedCoi && typeof crossOriginIsolated !== 'undefined' && !crossOriginIsolated) {
+      warnedCoi = true;
+      console.warn(
+        '[Zappar] crossOriginIsolated=false 입니다. ZapWorks 업로드 시 --cross-origin-isolation 이 필요할 수 있어요.',
+      );
+    }
+  };
+
+  if (sys.permissionGranted) {
+    startCamera();
+    return true;
+  }
 
   const granted = await ZapparThree.permissionRequestUI();
   sys.permissionGranted = granted;
-  if (granted) {
-    const userFacing = camEl.components['zappar-camera']?.data?.userFacing ?? false;
-    sys.camera.start(userFacing);
-  }
+  if (granted) startCamera();
   return granted;
+}
+
+function resizeARScene() {
+  if (scene?.resize) scene.resize();
 }
 
 function bindAREvents() {
@@ -242,6 +299,10 @@ function startScanner() {
   vf.classList.remove('locked');
 
   showScreen('scanner');
+  requestAnimationFrame(() => {
+    resizeARScene();
+    requestAnimationFrame(resizeARScene);
+  });
 
   const run = async () => {
     const ok = await ensureZapparPermission();
@@ -250,7 +311,13 @@ function startScanner() {
       return;
     }
     setZapparImageTrackersEnabled(true);
-    requestAnimationFrame(() => requestAnimationFrame(() => tuneCameraQuality()));
+    resizeARScene();
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        resizeARScene();
+        tuneCameraQuality();
+      }),
+    );
   };
 
   if (scene.hasLoaded) void run();
