@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(git checkout *)",
+      "Bash(sips -g pixelWidth -g pixelHeight /Users/younghoikoo/Project/upper-room-ar/public/poster.png)"
     ]
   }
 }
