@@ -10,6 +10,9 @@ const PROMPTS = [
   '하루 세 번, 멈추어 기도한다',
   '익숙한 자리를 다시 사랑한다',
 ];
+const CAMERA_IDEAL_WIDTH = 1280;
+const CAMERA_IDEAL_HEIGHT = 720;
+const CAMERA_IDEAL_FPS = 30;
 
 // ── DOM helpers ────────────────────────────────────────────────
 const $ = (id) => document.getElementById(id);
@@ -198,11 +201,69 @@ function startScanner() {
   const sys = scene.systems['mindar-image-system'];
   if (!sys) {
     scene.addEventListener('loaded', () => {
-      scene.systems['mindar-image-system'].start().catch(onARFail);
+      startMindARSystem(scene.systems['mindar-image-system']);
     }, { once: true });
     return;
   }
-  sys.start().catch(onARFail);
+  startMindARSystem(sys);
+}
+
+function startMindARSystem(sys) {
+  if (!sys) {
+    onARFail(new Error('MindAR image system is not ready'));
+    return;
+  }
+
+  sys.start()
+    .then(() => tuneCameraQuality())
+    .catch(onARFail);
+}
+
+async function tuneCameraQuality() {
+  await new Promise((resolve) => requestAnimationFrame(resolve));
+
+  const track = getActiveCameraTrack();
+  if (!track?.applyConstraints) return;
+
+  const constraints = buildCameraQualityConstraints(track);
+  try {
+    await track.applyConstraints(constraints);
+    console.info('Camera settings:', track.getSettings?.());
+  } catch (err) {
+    console.warn('Camera quality constraints were not applied:', err);
+  }
+}
+
+function getActiveCameraTrack() {
+  const videos = [...document.querySelectorAll('video')];
+  for (const video of videos) {
+    const stream = video.srcObject;
+    if (!(stream instanceof MediaStream)) continue;
+    const [track] = stream.getVideoTracks();
+    if (track?.readyState === 'live') return track;
+  }
+  return null;
+}
+
+function buildCameraQualityConstraints(track) {
+  const caps = track.getCapabilities?.() || {};
+  const constraints = {
+    width: { ideal: Math.min(CAMERA_IDEAL_WIDTH, caps.width?.max || CAMERA_IDEAL_WIDTH) },
+    height: { ideal: Math.min(CAMERA_IDEAL_HEIGHT, caps.height?.max || CAMERA_IDEAL_HEIGHT) },
+    frameRate: { ideal: Math.min(CAMERA_IDEAL_FPS, caps.frameRate?.max || CAMERA_IDEAL_FPS) },
+  };
+
+  if (caps.facingMode?.includes('environment')) {
+    constraints.facingMode = { ideal: 'environment' };
+  }
+
+  const advanced = {};
+  if (caps.focusMode?.includes('continuous')) advanced.focusMode = 'continuous';
+  if (caps.exposureMode?.includes('continuous')) advanced.exposureMode = 'continuous';
+  if (caps.whiteBalanceMode?.includes('continuous')) advanced.whiteBalanceMode = 'continuous';
+  if (Object.keys(advanced).length > 0) constraints.advanced = [advanced];
+
+  return constraints;
 }
 
 function onARFail(err) {
