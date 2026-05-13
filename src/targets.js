@@ -6,7 +6,7 @@ export const targets = [
     title: '기도의 창문',
     en: 'Window of Prayer',
     glyph: 'window',
-    hint: '창문 또는 하얀 벽면 근처',
+    hint: '창문 그림',
     message: '첫 번째 오브제를 발견했어요. 다니엘처럼 창문을 열고 기도하세요.',
     detailTitle: '매일의 자리를 지키는 기도',
     detail:
@@ -22,7 +22,7 @@ export const targets = [
     title: '하나님의 격려',
     en: "God's Encouragement",
     glyph: 'book',
-    hint: '성경책 또는 책상 주변',
+    hint: '책상 위의 펼쳐진 성경책',
     message: '두 번째 오브제를 발견했어요. 두려움 대신 하나님의 격려를 받으세요.',
     detailTitle: '두려움을 넘는 하나님의 말씀',
     detail:
@@ -38,7 +38,7 @@ export const targets = [
     title: '하늘의 빛',
     en: 'Light of Heaven',
     glyph: 'star',
-    hint: '굿즈 조명 근처',
+    hint: '무드등 굿즈',
     message: '세 번째 오브제를 발견했어요. 지혜로운 자는 별처럼 영원토록 빛납니다.',
     detailTitle: '별처럼 빛나는 삶',
     detail:
@@ -54,7 +54,7 @@ export const targets = [
     title: '기도의 능력',
     en: 'Power of Prayer',
     glyph: 'lamp',
-    hint: '어퍼룸 스카시 조명 근처',
+    hint: 'UPPER ROOM 구조물',
     message: '네 번째 오브제를 발견했어요. 기도는 하늘을 움직이는 능력입니다.',
     detailTitle: '기도를 시작하는 순간',
     detail:

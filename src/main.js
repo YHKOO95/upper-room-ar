@@ -36,7 +36,18 @@ renderHub();
 renderCompleteGlyphs();
 bindButtons();
 bindAREvents();
-showScreen('splash');
+
+const returnScreen = sessionStorage.getItem('upper-room-ar-return');
+if (returnScreen) {
+  sessionStorage.removeItem('upper-room-ar-return');
+  if (returnScreen === 'scanner') {
+    startScanner();
+  } else {
+    showScreen(returnScreen);
+  }
+} else {
+  showScreen('splash');
+}
 
 // ─────────────────────────────────────────────────────────────
 // Screen management
@@ -183,6 +194,7 @@ function bindAREvents() {
 
     entity.querySelectorAll('.clickable').forEach((el) => {
       el.addEventListener('click', () => {
+        sessionStorage.setItem('upper-room-ar-return', 'scanner');
         window.location.href = `/detail.html?target=${t.slug}`;
       });
     });
@@ -291,7 +303,7 @@ function showRevealedOverlay(target) {
     <p class="reveal-detail">${target.detail}</p>
     <div class="reveal-footer">
       <span class="reveal-verse-ref">${target.verseRef.toUpperCase()}</span>
-      <button class="reveal-detail-btn" onclick="location.href='/detail.html?target=${target.slug}'">자세히 →</button>
+      <button class="reveal-detail-btn" onclick="sessionStorage.setItem('upper-room-ar-return','scanner');location.href='/detail.html?target=${target.slug}'">자세히 →</button>
     </div>
   `;
   showScreen('revealed');
@@ -328,6 +340,7 @@ function renderHub() {
     `;
     card.addEventListener('click', () => {
       if (isFound) {
+        sessionStorage.setItem('upper-room-ar-return', 'hub');
         window.location.href = `/detail.html?target=${t.slug}`;
       } else {
         startScanner();
