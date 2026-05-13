@@ -6,11 +6,16 @@
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
-    "preview": "vite preview --host 0.0.0.0"
+    "preview": "vite preview --host 0.0.0.0",
+    "zapworks:upload": "npm run build && node scripts/zapworks-upload.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-basic-ssl": "latest",
+    "@zappar/zappar-aframe": "^3.2.0",
+    "@zappar/zappar-threejs": "^4.3.0",
     "vite": "latest"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@zappar/zapworks-cli": "^2.3.3"
+  }
 }

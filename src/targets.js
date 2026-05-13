@@ -47,22 +47,6 @@ export const targets = [
     verseRef: '다니엘 12:3',
     reflection: '내가 빛을 발하고 있는 자리는 어디인가요?\n주변 사람을 하나님께로 인도하고 있나요?',
   },
-  {
-    index: 3,
-    slug: 'sconce',
-    num: '04',
-    title: '기도의 능력',
-    en: 'Power of Prayer',
-    glyph: 'lamp',
-    hint: 'UPPER ROOM 구조물',
-    message: '네 번째 오브제를 발견했어요. 기도는 하늘을 움직이는 능력입니다.',
-    detailTitle: '기도를 시작하는 순간',
-    detail:
-      '다니엘이 기도를 시작하는 그 순간, 하나님의 응답 명령이 내려졌습니다. 기도는 하나님의 응답을 이끌어내는 통로입니다. 어퍼룸에 모여 기도하는 이 시간이 하늘의 문을 여는 순간입니다.',
-    verse: '네가 기도를 시작할 즈음에 명령이 내렸으므로 이제 내가 네게 알리러 왔느니라 너는 크게 은총을 입은 자라.',
-    verseRef: '다니엘 9:23',
-    reflection: '기도를 시작하는 것이 망설여질 때가 있나요?\n지금 이 자리에서 하나님께 무엇을 구하고 싶은가요?',
-  },
 ];
 
 export function findTargetBySlug(slug) {

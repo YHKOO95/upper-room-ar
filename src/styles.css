@@ -93,12 +93,11 @@ a-scene {
   margin: 0 !important;
   overflow: hidden !important;
   opacity: 0;
-  visibility: hidden;
   pointer-events: none;
+  transition: opacity 200ms ease;
 }
 a-scene.ar-active {
   opacity: 1;
-  visibility: visible;
 }
 a-scene canvas,
 a-scene .a-canvas,

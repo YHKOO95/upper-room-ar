@@ -1,5 +1,7 @@
 import './styles.css';
-import { findTargetBySlug } from './targets.js';
+import { findTargetBySlug, targets } from './targets.js';
+
+const TARGET_TOTAL = targets.length;
 
 const params = new URLSearchParams(window.location.search);
 const target = findTargetBySlug(params.get('target'));
@@ -18,7 +20,7 @@ function renderDetail(t) {
   const foundCount = foundSet.size;
 
   root.innerHTML = `
-    <a class="back-link" href="/">
+    <a class="back-link" href="index.html">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
         <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
       </svg>
@@ -52,10 +54,10 @@ function renderDetail(t) {
     </article>
 
     <div class="detail-actions">
-      <a class="detail-btn-primary" href="/">
-        ${foundCount >= 4 ? '완성된 다락방 보기' : `다음 표식 찾기 (${foundCount}/4)`}
+      <a class="detail-btn-primary" href="index.html">
+        ${foundCount >= TARGET_TOTAL ? '완성된 다락방 보기' : `다음 표식 찾기 (${foundCount}/${TARGET_TOTAL})`}
       </a>
-      <a class="detail-btn-ghost" href="/">AR 화면으로 돌아가기</a>
+      <a class="detail-btn-ghost" href="index.html">AR 화면으로 돌아가기</a>
     </div>
   `;
 }
@@ -63,7 +65,7 @@ function renderDetail(t) {
 function renderNotFound() {
   document.title = '오브제를 찾을 수 없어요';
   root.innerHTML = `
-    <a class="back-link" href="/">
+    <a class="back-link" href="index.html">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
         <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
       </svg>

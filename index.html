@@ -9,8 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"/>
-  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
   <script src="https://unpkg.com/html-to-image@1.11.13/dist/html-to-image.js"></script>
 </head>
 <body>
@@ -23,11 +22,11 @@
       <span class="pill">2026 · ONNURI JOSHUA</span>
     </div>
     <div class="splash-logo-area">
-      <img src="/upper-room-logo.png" alt="UPPER ROOM" class="splash-logo"/>
+      <img src="./upper-room-logo.png" alt="UPPER ROOM" class="splash-logo"/>
       <p class="splash-tagline">비상수련회 · AR 컨텐츠</p>
     </div>
     <div class="splash-bottom">
-      <p class="splash-desc">사랑홀 로비 곳곳에 숨겨진 4개의 표식을<br>카메라로 비춰보세요</p>
+      <p class="splash-desc">사랑홀 로비 곳곳에 숨겨진 3개의 표식을<br>카메라로 비춰보세요</p>
       <button class="btn-primary glow" id="btn-start">시작하기 →</button>
       <p class="splash-verse"><span class="mono-sm">DANIEL 6:10</span></p>
     </div>
@@ -62,9 +61,9 @@
     <div class="hub-scroll">
       <div class="hub-header-row">
         <span class="pill">UPPER ROOM · AR</span>
-        <span class="mono-sm" id="hub-count">00 / 04</span>
+        <span class="mono-sm" id="hub-count">00 / 03</span>
       </div>
-      <h1 class="hub-title">네 개의 표식</h1>
+      <h1 class="hub-title">세 개의 표식</h1>
       <p class="hub-desc">사랑홀 로비 곳곳에 숨겨진 표식을 찾아 카메라로 비춰보세요.</p>
       <div class="hub-progress-bar"><div class="hub-progress-fill" id="hub-fill"></div></div>
       <div class="hub-list" id="hub-list"></div>
@@ -114,10 +113,10 @@
   <div id="s-complete" class="screen">
     <div class="stardust" id="dust-complete"></div>
     <div class="wg wg-lg" style="top:36%;"></div>
-    <div class="complete-top"><span class="pill">04 / 04 · COMPLETE</span></div>
+    <div class="complete-top"><span class="pill">03 / 03 · COMPLETE</span></div>
     <div class="complete-ht"><div class="ht-xl">THE LIGHT<br>HAS COME</div></div>
     <div class="complete-glyphs" id="complete-glyphs"></div>
-    <p class="complete-desc">네 자리에서 켜진 빛이 다락방에 모였습니다.<br>오늘 밤, 같은 자리에서 무릎을 꿇어보아요.</p>
+    <p class="complete-desc">세 자리에서 켜진 빛이 다락방에 모였습니다.<br>오늘 밤, 같은 자리에서 무릎을 꿇어보아요.</p>
     <div class="screen-bottom">
       <button class="btn-primary glow" id="btn-make-card">기념 카드 만들기 →</button>
       <div class="btn-ghost-row"><button class="btn-ghost" id="btn-complete-reset">처음으로</button></div>
@@ -225,7 +224,6 @@
 <!-- A-FRAME AR SCENE ──────────────────────────────────────────── -->
 <a-scene
   id="ar-scene"
-  mindar-image="imageTargetSrc: /targets/upper-room-targets.mind?v=2; maxTrack: 4; autoStart: false; uiScanning: none; filterMinCF: 0.0001; filterBeta: 0.001"
   color-space="sRGB"
   renderer="colorManagement: true; physicallyCorrectLights: true; alpha: true"
   vr-mode-ui="enabled: false"
@@ -234,9 +232,17 @@
   raycaster="objects: .clickable"
   embedded
 >
-  <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+  <a-assets>
+    <a-asset-item id="zpt-0" src="./targets/1.zpt"></a-asset-item>
+    <a-asset-item id="zpt-1" src="./targets/2.zpt"></a-asset-item>
+    <a-asset-item id="zpt-2" src="./targets/3.zpt"></a-asset-item>
+  </a-assets>
 
-  <a-entity id="ar-target-0" mindar-image-target="targetIndex: 0" data-target-index="0">
+  <a-entity zappar-compatibility-ui></a-entity>
+
+  <a-entity id="zappar-cam" camera position="0 0 0" look-controls="enabled: false" zappar-camera></a-entity>
+
+  <a-entity id="ar-target-0" zappar-image="target: #zpt-0; enabled: false" data-target-index="0">
     <a-ring class="clickable" position="0 0 0" radius-inner="0.38" radius-outer="0.5" color="#facc15"
       animation="property: rotation; to: 0 0 360; loop: true; dur: 6000"></a-ring>
     <a-torus class="clickable" position="0 0 0.08" radius="0.28" radius-tubular="0.018" color="#38bdf8"
@@ -244,7 +250,7 @@
     <a-text value="빛의 문" align="center" position="0 -0.58 0.05" width="1.8" color="#ffffff"></a-text>
   </a-entity>
 
-  <a-entity id="ar-target-1" mindar-image-target="targetIndex: 1" data-target-index="1">
+  <a-entity id="ar-target-1" zappar-image="target: #zpt-1; enabled: false" data-target-index="1">
     <a-box class="clickable" position="0 0.04 0.04" depth="0.06" height="0.58" width="0.1" color="#e0f2fe"
       animation="property: rotation; to: 0 360 0; loop: true; dur: 5000"></a-box>
     <a-cone class="clickable" position="0 0.42 0.04" radius-bottom="0.11" height="0.22" color="#f8fafc"></a-cone>
@@ -252,7 +258,7 @@
     <a-text value="말씀의 검" align="center" position="0 -0.58 0.05" width="1.8" color="#ffffff"></a-text>
   </a-entity>
 
-  <a-entity id="ar-target-2" mindar-image-target="targetIndex: 2" data-target-index="2">
+  <a-entity id="ar-target-2" zappar-image="target: #zpt-2; enabled: false" data-target-index="2">
     <a-cone class="clickable" position="0 0.02 0.05" radius-bottom="0.22" height="0.48" color="#fb7185"
       animation="property: scale; dir: alternate; to: 1.18 1.18 1.18; loop: true; dur: 850"></a-cone>
     <a-cone class="clickable" position="0 0.04 0.1" radius-bottom="0.13" height="0.34" color="#fbbf24"
@@ -260,12 +266,6 @@
     <a-text value="기도의 불씨" align="center" position="0 -0.58 0.05" width="1.8" color="#ffffff"></a-text>
   </a-entity>
 
-  <a-entity id="ar-target-3" mindar-image-target="targetIndex: 3" data-target-index="3">
-    <a-cylinder class="clickable" position="-0.18 0 0.04" radius="0.025" height="0.72" color="#cbd5e1"></a-cylinder>
-    <a-plane class="clickable" position="0.08 0.18 0.04" width="0.48" height="0.28" color="#60a5fa"
-      animation="property: rotation; dir: alternate; to: 0 12 0; loop: true; dur: 1200"></a-plane>
-    <a-text value="비상의 깃발" align="center" position="0 -0.58 0.05" width="1.8" color="#ffffff"></a-text>
-  </a-entity>
 </a-scene>
 
 <script type="module" src="/src/main.js"></script>

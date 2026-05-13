@@ -1,7 +1,14 @@
 import './styles.css';
+import '@zappar/zappar-aframe';
+import * as ZapparThree from '@zappar/zappar-threejs';
 import { targets } from './targets.js';
 
 // ── Constants ──────────────────────────────────────────────────
+const TARGET_TOTAL = targets.length;
+const SEAL_STAGE_FRAC = Array.from(
+  { length: TARGET_TOTAL },
+  (_, i) => 0.22 + ((0.94 - 0.22) * i) / Math.max(1, TARGET_TOTAL - 1),
+);
 const STORAGE_KEY = 'upper-room-ar-found';
 const HOLD_MS = 1500;
 const PROMPTS = [
@@ -68,15 +75,20 @@ function bindButtons() {
   // Splash
   $('btn-start').addEventListener('click', () => showScreen('perm'));
 
-  // Permission
-  $('btn-perm-go').addEventListener('click', () => {
+  // Permission (Zappar camera + motion — must run above UI; see ensureZapparPermission)
+  $('btn-perm-go').addEventListener('click', async () => {
+    const ok = await ensureZapparPermission();
+    if (!ok) {
+      alert('카메라·모션 접근을 허용해야 AR 표식을 찾을 수 있어요.');
+      return;
+    }
     showScreen('hub');
   });
   $('btn-perm-skip').addEventListener('click', () => showScreen('hub'));
 
   // Hub
   $('btn-hub-scan').addEventListener('click', () => {
-    if (found.size >= 4) {
+    if (found.size >= TARGET_TOTAL) {
       showScreen('complete');
     } else {
       startScanner();
@@ -168,14 +180,35 @@ function bindButtons() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// AR / MindAR
+// AR / Zappar
 // ─────────────────────────────────────────────────────────────
+async function ensureZapparPermission() {
+  const sys = scene?.systems?.['zappar-camera'];
+  const camEl = document.querySelector('#zappar-cam');
+  if (!sys || !camEl) return false;
+  if (sys.permissionGranted) return true;
+
+  const granted = await ZapparThree.permissionRequestUI();
+  sys.permissionGranted = granted;
+  if (granted) {
+    const userFacing = camEl.components['zappar-camera']?.data?.userFacing ?? false;
+    sys.camera.start(userFacing);
+  }
+  return granted;
+}
+
 function bindAREvents() {
+  const cam = document.querySelector('#zappar-cam');
+  if (cam && !cam._zapparTuned) {
+    cam._zapparTuned = true;
+    cam.addEventListener('first-frame', () => tuneCameraQuality(), { once: true });
+  }
+
   targets.forEach((t) => {
     const entity = document.querySelector(`[data-target-index="${t.index}"]`);
     if (!entity) return;
 
-    entity.addEventListener('targetFound', () => {
+    entity.addEventListener('zappar-visible', () => {
       if (!found.has(t.index)) {
         found.add(t.index);
         saveFoundTargets();
@@ -186,7 +219,7 @@ function bindAREvents() {
       navigator.vibrate?.(80);
     });
 
-    entity.addEventListener('targetLost', () => {
+    entity.addEventListener('zappar-notvisible', () => {
       if (document.getElementById('s-revealed')?.classList.contains('active')) {
         showScreen('scanner');
       }
@@ -195,7 +228,7 @@ function bindAREvents() {
     entity.querySelectorAll('.clickable').forEach((el) => {
       el.addEventListener('click', () => {
         sessionStorage.setItem('upper-room-ar-return', 'scanner');
-        window.location.href = `/detail.html?target=${t.slug}`;
+        window.location.href = `detail.html?target=${t.slug}`;
       });
     });
   });
@@ -210,25 +243,18 @@ function startScanner() {
 
   showScreen('scanner');
 
-  const sys = scene.systems['mindar-image-system'];
-  if (!sys) {
-    scene.addEventListener('loaded', () => {
-      startMindARSystem(scene.systems['mindar-image-system']);
-    }, { once: true });
-    return;
-  }
-  startMindARSystem(sys);
-}
+  const run = async () => {
+    const ok = await ensureZapparPermission();
+    if (!ok) {
+      statusPill.textContent = '카메라 권한이 필요해요';
+      return;
+    }
+    setZapparImageTrackersEnabled(true);
+    requestAnimationFrame(() => requestAnimationFrame(() => tuneCameraQuality()));
+  };
 
-function startMindARSystem(sys) {
-  if (!sys) {
-    onARFail(new Error('MindAR image system is not ready'));
-    return;
-  }
-
-  sys.start()
-    .then(() => tuneCameraQuality())
-    .catch(onARFail);
+  if (scene.hasLoaded) void run();
+  else scene.addEventListener('loaded', () => void run(), { once: true });
 }
 
 async function tuneCameraQuality() {
@@ -278,13 +304,16 @@ function buildCameraQualityConstraints(track) {
   return constraints;
 }
 
-function onARFail(err) {
-  console.error('AR start failed:', err);
-  $('scan-status-text').textContent = '카메라를 열 수 없어요';
+function setZapparImageTrackersEnabled(on) {
+  targets.forEach((t) => {
+    const el = document.querySelector(`[data-target-index="${t.index}"]`);
+    if (!el) return;
+    el.setAttribute('zappar-image', { target: `#zpt-${t.index}`, enabled: on });
+  });
 }
 
 function stopAR() {
-  try { scene.systems['mindar-image-system']?.stop(); } catch {}
+  setZapparImageTrackersEnabled(false);
 }
 
 function showRevealedOverlay(target) {
@@ -303,7 +332,7 @@ function showRevealedOverlay(target) {
     <p class="reveal-detail">${target.detail}</p>
     <div class="reveal-footer">
       <span class="reveal-verse-ref">${target.verseRef.toUpperCase()}</span>
-      <button class="reveal-detail-btn" onclick="sessionStorage.setItem('upper-room-ar-return','scanner');location.href='/detail.html?target=${target.slug}'">자세히 →</button>
+      <button class="reveal-detail-btn" onclick="sessionStorage.setItem('upper-room-ar-return','scanner');location.href='detail.html?target=${target.slug}'">자세히 →</button>
     </div>
   `;
   showScreen('revealed');
@@ -314,11 +343,12 @@ function showRevealedOverlay(target) {
 // ─────────────────────────────────────────────────────────────
 function renderHub() {
   const count = found.size;
-  $('hub-count').textContent = `${String(count).padStart(2, '0')} / 04`;
-  $('hub-fill').style.width = `${(count / 4) * 100}%`;
+  const tot = String(TARGET_TOTAL).padStart(2, '0');
+  $('hub-count').textContent = `${String(count).padStart(2, '0')} / ${tot}`;
+  $('hub-fill').style.width = `${(count / TARGET_TOTAL) * 100}%`;
 
   const btnScan = $('btn-hub-scan');
-  btnScan.textContent = count >= 4 ? '다락방의 빛 보기 →' : '카메라로 찾기';
+  btnScan.textContent = count >= TARGET_TOTAL ? '다락방의 빛 보기 →' : '카메라로 찾기';
 
   const list = $('hub-list');
   list.innerHTML = '';
@@ -341,7 +371,7 @@ function renderHub() {
     card.addEventListener('click', () => {
       if (isFound) {
         sessionStorage.setItem('upper-room-ar-return', 'hub');
-        window.location.href = `/detail.html?target=${t.slug}`;
+        window.location.href = `detail.html?target=${t.slug}`;
       } else {
         startScanner();
       }
@@ -486,8 +516,7 @@ function setSealProgress(p) {
   inner.style.boxShadow = `0 0 ${20 + p * 40}px rgba(245,194,107,${0.3 + p * 0.4})`;
 
   // light up glyphs progressively
-  const stages = [0.2, 0.45, 0.7, 0.95];
-  const litCount = stages.filter((s) => p >= s).length;
+  const litCount = SEAL_STAGE_FRAC.filter((s) => p >= s).length;
   updateSealCard(litCount);
 
   // glow intensity on window element
@@ -506,7 +535,7 @@ function updateSealCard(litCount) {
     item.classList.toggle('lit', i < litCount);
   });
   const glow = document.querySelector('#seal-card-wrap .card-center-glow');
-  if (glow) glow.classList.toggle('sealed', litCount === 4);
+  if (glow) glow.classList.toggle('sealed', litCount === TARGET_TOTAL);
 }
 
 async function onSealComplete() {
@@ -522,7 +551,7 @@ async function onSealComplete() {
   // Update card to fully sealed state
   const oldCard = wrap.querySelector('.comm-card');
   if (oldCard) oldCard.remove();
-  const newCard = buildCommCard({ sealed: true, litCount: 4, serial: sealSerial });
+  const newCard = buildCommCard({ sealed: true, litCount: TARGET_TOTAL, serial: sealSerial });
   wrap.appendChild(newCard);
 
   $('seal-hint').style.display = 'none';
@@ -586,7 +615,7 @@ function showToast() {
 // ─────────────────────────────────────────────────────────────
 // Commemorative card builder
 // ─────────────────────────────────────────────────────────────
-function buildCommCard({ sealed = false, litCount = 4, serial = '' } = {}) {
+function buildCommCard({ sealed = false, litCount = TARGET_TOTAL, serial = '' } = {}) {
   const today = getTodayStr();
   const resolution = card.resolution;
   const name = card.name;
@@ -789,7 +818,10 @@ function spawnDust(container, { density = 1, focal = 'top' } = {}) {
 function readFoundTargets() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
+    const arr = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(arr)) return [];
+    const valid = new Set(targets.map((t) => t.index));
+    return arr.filter((i) => valid.has(i));
   } catch {
     return [];
   }
