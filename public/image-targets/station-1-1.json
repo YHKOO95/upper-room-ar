@@ -4,13 +4,13 @@
   "name": "station-1-1",
   "type": "PLANAR",
   "properties": {
-    "left": 213,
+    "left": 0,
     "top": 0,
-    "width": 540,
-    "height": 720,
+    "width": 3000,
+    "height": 4000,
     "isRotated": false,
-    "originalWidth": 965,
-    "originalHeight": 720
+    "originalWidth": 3000,
+    "originalHeight": 4000
   },
   "resources": {
     "originalImage": "station-1-1_original.png",
@@ -18,6 +18,6 @@
     "thumbnailImage": "station-1-1_thumbnail.png",
     "luminanceImage": "station-1-1_luminance.png"
   },
-  "created": 1778690854577,
-  "updated": 1778690854577
+  "created": 1778766389848,
+  "updated": 1778766389848
 }

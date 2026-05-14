@@ -727,6 +727,13 @@ function stationGlyphSVG(kind, size = 64, glow = false) {
         <line x1="25" y1="46" x2="39" y2="46" stroke="${w}" stroke-width="1"/>
         <circle cx="32" cy="25" r="${glow ? 3.5 : 2.5}" fill="${glow ? c : 'rgba(255,255,255,0.3)'}" stroke="${w}" stroke-width="0.6"/>
       </svg>`;
+    case 'flag':
+      return `<svg ${common}>
+        <line x1="20" y1="12" x2="20" y2="52" stroke="${w}" stroke-width="1.4" stroke-linecap="round"/>
+        <circle cx="20" cy="12" r="3.2" fill="${glow ? c : 'rgba(255,255,255,0.15)'}" stroke="${w}" stroke-width="0.8"/>
+        <path d="M22 18 L22 40 L48 29 Z" stroke="${w}" stroke-width="1.1" fill="${glow ? 'rgba(185,28,28,0.35)' : 'rgba(255,255,255,0.06)'}"/>
+        ${glow ? `<path d="M23 20 L23 36 L42 28 Z" fill="${c}" opacity="0.25"/>` : ''}
+      </svg>`;
     default:
       return `<svg ${common}><circle cx="32" cy="32" r="16" stroke="${w}" stroke-width="1.2"/></svg>`;
   }
