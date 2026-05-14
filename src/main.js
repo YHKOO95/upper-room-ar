@@ -1,6 +1,6 @@
 import './styles.css';
 import { XR8Promise } from '@8thwall/engine-binary';
-import { targets } from './targets.js';
+import { targets, imageTargetNamesForStation } from './targets.js';
 
 // ── Constants ──────────────────────────────────────────────────
 const TARGET_TOTAL = targets.length;
@@ -185,15 +185,30 @@ async function configureEightWallImageTargets() {
     try {
       const XR8 = await XR8Promise;
       const base = import.meta.env.BASE_URL ?? './';
+      const names = targets.flatMap((t) => imageTargetNamesForStation(t.stationNum));
       const jsonData = await Promise.all(
-        targets.map((t) =>
-          fetch(`${base}image-targets/${t.imageTargetName}.json`).then((r) => {
-            if (!r.ok) throw new Error(`${t.imageTargetName}: ${r.status}`);
+        names.map((name) =>
+          fetch(`${base}image-targets/${name}.json`).then((r) => {
+            if (!r.ok) throw new Error(`${name}: ${r.status}`);
             return r.json();
           }),
         ),
       );
+      for (const d of jsonData) {
+        if (d.imagePath && typeof d.imagePath === 'string' && !/^https?:\/\//i.test(d.imagePath)) {
+          d.imagePath = new URL(d.imagePath, window.location.href).href;
+        }
+      }
       XR8.XrController.configure({ imageTargetData: jsonData });
+      console.info('[8th Wall] imageTargetData:', jsonData.length, jsonData.map((x) => x.name).join(', '));
+
+      if (new URLSearchParams(window.location.search).has('ardebug')) {
+        const sceneEl = document.querySelector('a-scene');
+        sceneEl?.addEventListener('xrimagefound', (e) =>
+          console.info('[AR] xrimagefound', e.detail?.name, e.detail),
+        );
+        sceneEl?.addEventListener('xrimagelost', (e) => console.info('[AR] xrimagelost', e.detail?.name));
+      }
     } catch (e) {
       console.error('[8th Wall] image target configure failed', e);
     }
@@ -208,30 +223,32 @@ function resizeARScene() {
 
 function bindAREvents() {
   targets.forEach((t) => {
-    const entity = document.querySelector(`[data-target-index="${t.index}"]`);
-    if (!entity) return;
+    const entities = document.querySelectorAll(`[data-target-index="${t.index}"]`);
+    if (!entities.length) return;
 
-    entity.addEventListener('xrextrasfound', () => {
-      if (!found.has(t.index)) {
-        found.add(t.index);
-        saveFoundTargets();
-        renderHub();
-      }
-      curIdx = t.index;
-      showRevealedOverlay(t);
-      navigator.vibrate?.(80);
-    });
+    entities.forEach((entity) => {
+      entity.addEventListener('xrextrasfound', () => {
+        if (!found.has(t.index)) {
+          found.add(t.index);
+          saveFoundTargets();
+          renderHub();
+        }
+        curIdx = t.index;
+        showRevealedOverlay(t);
+        navigator.vibrate?.(80);
+      });
 
-    entity.addEventListener('xrextraslost', () => {
-      if (document.getElementById('s-revealed')?.classList.contains('active')) {
-        showScreen('scanner');
-      }
-    });
+      entity.addEventListener('xrextraslost', () => {
+        if (document.getElementById('s-revealed')?.classList.contains('active')) {
+          showScreen('scanner');
+        }
+      });
 
-    entity.querySelectorAll('.clickable').forEach((el) => {
-      el.addEventListener('click', () => {
-        sessionStorage.setItem('upper-room-ar-return', 'scanner');
-        window.location.href = `detail.html?target=${t.slug}`;
+      entity.querySelectorAll('.clickable').forEach((el) => {
+        el.addEventListener('click', () => {
+          sessionStorage.setItem('upper-room-ar-return', 'scanner');
+          window.location.href = `detail.html?target=${t.slug}`;
+        });
       });
     });
   });

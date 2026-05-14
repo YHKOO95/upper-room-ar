@@ -1,0 +1,23 @@
+{
+  "imagePath": "image-targets/station-3-2_luminance.png",
+  "metadata": null,
+  "name": "station-3-2",
+  "type": "PLANAR",
+  "properties": {
+    "left": 0,
+    "top": 0,
+    "width": 790,
+    "height": 1053,
+    "isRotated": false,
+    "originalWidth": 790,
+    "originalHeight": 1053
+  },
+  "resources": {
+    "originalImage": "station-3-2_original.png",
+    "croppedImage": "station-3-2_cropped.png",
+    "thumbnailImage": "station-3-2_thumbnail.png",
+    "luminanceImage": "station-3-2_luminance.png"
+  },
+  "created": 1778690113432,
+  "updated": 1778690113432
+}

@@ -1,8 +1,14 @@
+/**
+ * 역당 JSON·씬 타깃 개수. 1이면 `station-N-1`만 사용(인식 안정에 유리).
+ * 늘리려면 `N-2` … 파일 + index.html 의 xrextras 블록도 같은 개수로 추가.
+ */
+export const IMAGE_REFS_PER_STATION = 1;
+
 export const targets = [
   {
     index: 0,
-    /** 8th Wall named image target + generated JSON basename */
-    imageTargetName: 'station-1',
+    /** `station-{stationNum}-{1…IMAGE_REFS_PER_STATION}` JSON / named-image-target */
+    stationNum: 1,
     slug: 'window',
     num: '01',
     title: '기도의 창문',
@@ -19,7 +25,7 @@ export const targets = [
   },
   {
     index: 1,
-    imageTargetName: 'station-2',
+    stationNum: 2,
     slug: 'bible',
     num: '02',
     title: '하나님의 격려',
@@ -36,7 +42,7 @@ export const targets = [
   },
   {
     index: 2,
-    imageTargetName: 'station-3',
+    stationNum: 3,
     slug: 'light',
     num: '03',
     title: '하늘의 빛',
@@ -52,6 +58,14 @@ export const targets = [
     reflection: '내가 빛을 발하고 있는 자리는 어디인가요?\n주변 사람을 하나님께로 인도하고 있나요?',
   },
 ];
+
+/** 8th Wall `name` 목록 (한 역의 여러 각도/촬영본) */
+export function imageTargetNamesForStation(stationNum) {
+  return Array.from(
+    { length: IMAGE_REFS_PER_STATION },
+    (_, i) => `station-${stationNum}-${i + 1}`,
+  );
+}
 
 export function findTargetBySlug(slug) {
   return targets.find((t) => t.slug === slug);
