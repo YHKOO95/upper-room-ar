@@ -94,13 +94,14 @@
           <rect x="8" y="3" width="8" height="3" rx="1" stroke="#F5C26B" stroke-width="1.4"/>
         </svg>
       </div>
-      <h2 class="perm-title">카메라가 필요해요</h2>
-      <p class="perm-desc">숨겨진 표식을 인식하기 위해<br>카메라 접근을 허용해 주세요.<br>
+      <h2 class="perm-title">카메라 안내</h2>
+      <p class="perm-desc">표식을 찾는 <strong>스캔 화면</strong>에서만 카메라가 켜집니다.<br>
+        브라우저에서 카메라 허용을 물으면 허용해 주세요.<br>
         <span class="perm-note">사진은 저장되거나 전송되지 않습니다.</span>
       </p>
     </div>
     <div class="screen-bottom">
-      <button class="btn-primary glow" id="btn-perm-go">카메라 켜기</button>
+      <button class="btn-primary glow" id="btn-perm-go">다음 →</button>
       <div class="btn-ghost-row"><button class="btn-ghost" id="btn-perm-skip">나중에</button></div>
     </div>
   </div>
@@ -150,7 +151,7 @@
     <div class="scanner-bar">
       <button class="icon-btn" id="btn-reveal-close">✕</button>
       <div class="scanner-bar-right">
-        <button class="icon-btn">↗</button>
+        <button type="button" class="icon-btn" id="btn-reveal-expand" aria-label="자세히 보기">↗</button>
       </div>
     </div>
     <div class="reveal-caption">

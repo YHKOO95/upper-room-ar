@@ -23,6 +23,8 @@ const scene = document.querySelector('#ar-scene');
 
 // ── App state ──────────────────────────────────────────────────
 let found = new Set(readFoundTargets());
+/** AR(스캔/발견) 화면 활성 여부 — 8th Wall은 첫 초기화 끝나기 전 pause 하면 로딩/권한이 영원히 안 뜨는 경우가 있어, false↔true 전환 때만 동기화합니다. */
+let prevArScreenActive = false;
 let curIdx = null;
 let card = { resolution: '', name: '', group: '' };
 let promptIdx = 0;
@@ -72,6 +74,10 @@ function showScreen(name) {
 
   const arActive = name === 'scanner' || name === 'revealed';
   scene.classList.toggle('ar-active', arActive);
+  if (arActive !== prevArScreenActive) {
+    prevArScreenActive = arActive;
+    void syncEightWallCamera(arActive);
+  }
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -102,6 +108,13 @@ function bindButtons() {
   // Revealed close
   $('btn-reveal-close').addEventListener('click', () => {
     showScreen('hub');
+  });
+  $('btn-reveal-expand').addEventListener('click', () => {
+    if (curIdx == null) return;
+    const t = targets.find((x) => x.index === curIdx);
+    if (!t) return;
+    sessionStorage.setItem('upper-room-ar-return', 'scanner');
+    window.location.href = `detail.html?target=${t.slug}`;
   });
 
   // Complete
@@ -180,6 +193,25 @@ function bindButtons() {
 // ─────────────────────────────────────────────────────────────
 // AR / 8th Wall
 // ─────────────────────────────────────────────────────────────
+/** 스캔·발견 화면을 떠날 때만 pause, 들어올 때만 resume. 초기 로드 직후 pause는 금지(랜딩/권한 플로우 정지 방지). */
+async function syncEightWallCamera(wantActive) {
+  try {
+    const XR8 = await XR8Promise;
+    if (!XR8) return;
+    const pause = XR8.pause?.bind(XR8);
+    const resume = XR8.resume?.bind(XR8);
+    const isPaused =
+      typeof XR8.isPaused === 'function' ? XR8.isPaused.bind(XR8) : null;
+    if (wantActive) {
+      if (resume && isPaused && isPaused()) resume();
+    } else if (pause && (!isPaused || !isPaused())) {
+      pause();
+    }
+  } catch (e) {
+    console.warn('[8th Wall] camera sync', e);
+  }
+}
+
 async function configureEightWallImageTargets() {
   const load = async () => {
     try {
@@ -270,6 +302,7 @@ function startScanner() {
   const run = () => {
     resizeARScene();
     requestAnimationFrame(() => requestAnimationFrame(resizeARScene));
+    void syncEightWallCamera(true);
   };
 
   if (scene.hasLoaded) run();
