@@ -1,6 +1,6 @@
 # 2026 여호수아 비상수련회 AR 컨텐츠
 
-모바일 웹에서 카메라로 숨겨진 이미지 타겟을 비추면 AR 오브젝트가 나타나는 MVP입니다. 런타임은 **8th Wall**(A-Frame 연동)을 사용합니다.
+모바일 웹에서 카메라로 숨겨진 이미지 타겟을 비추면 AR 오브젝트가 나타나는 MVP입니다. **UI는 React 19 + React Router(Hash)** 로, **스캔만** 별도 `scan.html`(8th Wall + A-Frame)입니다.
 
 ## 실행
 
@@ -9,53 +9,43 @@ npm install
 npm run dev
 ```
 
-모바일 카메라는 HTTPS 환경에서만 안정적으로 동작합니다. 이 프로젝트는 개발 서버도 HTTPS로 실행되도록 설정되어 있습니다.
+- 앱 진입: `https://호스트/` → 해시 라우트 예: `/#/hub`, `/#/detail?target=slug`
+- 스캔: `./scan.html` (허브·상세에서 이동)
 
-## 화면(멀티 페이지) 흐름
+모바일 카메라는 HTTPS가 필요합니다.
 
-| 파일 | 역할 |
+## 화면 흐름
+
+| 경로 | 내용 |
 |------|------|
-| `index.html` | 스플래시 |
-| `perm.html` | 카메라 안내 |
-| `hub.html` | 표식 목록·진행도 |
-| `scan.html` | **8th Wall + A-Frame** 스캔·발견 오버레이만 |
-| `detail.html?target=` | 오브제 상세 |
-| `complete.html` | 네 표식 완료 |
-| `reflect.html` → `engrave.html` → `seal.html` | 기념 카드 |
+| `/#/` | 스플래시 |
+| `/#/perm` | 카메라 안내 |
+| `/#/hub` | 표식 목록 |
+| `scan.html` | AR 스캔·발견 |
+| `/#/detail?target=` | 상세 |
+| `/#/complete` | 완료 |
+| `/#/reflect` → `/#/engrave` → `/#/seal` | 기념 카드 |
 
-발견한 표식은 `localStorage`(`upper-room-ar-found`), 카드 작성 중 데이터는 `sessionStorage`(`upper-room-ar-card`)에 둡니다.
+`localStorage`(`upper-room-ar-found`), `sessionStorage`(`upper-room-ar-card`)는 그대로입니다.
 
-## 이미지 타겟 준비
+## 이미지 타겟
 
-1. 실물 표식 사진을 `public/targets/{역번호}-{참조번호}.png`(또는 `jpg`/`webp`)로 넣습니다. (`scripts/build-8th-targets.mjs`와 `src/targets.js`의 역·참조 개수와 맞춥니다.)
-2. 빌드 전에 8th Wall용 메타데이터를 생성합니다.
+1. `public/targets/{역}-{참조}.png` 등
+2. `npm run gen:targets` → `public/image-targets/`
 
-```bash
-npm run gen:targets
-```
+## 구조
 
-생성물은 `public/image-targets/` 아래 `.json` 및 관련 이미지입니다. `npm run build`의 `prebuild`에서 자동으로 실행됩니다.
+- `src/main.jsx`, `src/App.jsx` — 라우트
+- `src/pages/*.jsx` — UI 화면
+- `src/lib/shared.js` — 글리프·카드·저장소
+- `src/entry-scan.js` + `scan.html` — 8th Wall only
+- `src/scanHref.js` — `scan.html` ↔ React 앱 링크
 
-현재 앱 타깃(예시):
+## 운영
 
-1. 기도의 창문
-2. 하나님의 격려
-3. 하늘의 빛
-4. 기도의 능력 (어퍼룸 스카시 · 다니엘 9:23)
-
-## 구현 구조
-
-- `scan.html` + `src/entry-scan.js`: 8th Wall XR, 이미지 타깃, 스캔 UI
-- `src/entry-*.js`: 화면별 진입 스크립트
-- `src/lib/shared.js`: 공통(글리프, 카드 빌더, 저장소 헬퍼)
-- `src/targets.js`: 역 메타데이터·`station-N-M` 이름 규칙
-- `src/styles.css`: 모바일 우선 UI
-- `public/targets`: 원본 표식 이미지(빌드 입력)
-- `public/image-targets`: 8th Wall 이미지 타깃 산출물(빌드 출력)
-
-## 운영 체크리스트
-
-- iOS Safari와 Android Chrome에서 모두 테스트
-- 실내 조명과 실제 오브제 위치에서 타겟 인식률 확인
-- 이미지 타겟은 반사, 흔들림, 반복 패턴이 적은 디자인으로 제작
-- 3D 모델 용량은 모바일 네트워크 기준으로 최적화
+- iOS Safari / Android Chrome에서 스캔·해시 라우트 동작 확인
+- 이미지 타깃 인식률·HTTPS 확인
+- **스캔에서 8th Wall 로딩만 계속될 때**
+  - 배포 서버에 **전역 `Cross-Origin-Embedder-Policy` / `Cross-Origin-Opener-Policy`** 를 켜 두면 WebAR wasm·워커가 막혀 무한 로딩처럼 보일 수 있습니다. 이 저장소의 `vercel.json`은 그런 헤더를 두지 않습니다.
+  - **앱 키가 없을 때** 엔진은 CDN이 아니라 빌드 시 `dist/xr-engine/`에 복사된 바이너리를 **같은 사이트**에서 로드합니다(`vite.config.js`). 차단·TLS·기업망 이슈를 줄이려는 대안입니다.
+  - 프로덕션에서는 [8th Wall](https://www.8thwall.com) 프로젝트 **앱 키**를 발급받아 루트에 `.env`에 `VITE_8THWALL_APP_KEY=` 로 넣고, **호스트 도메인을 콘솔에 등록**한 뒤 다시 빌드·배포하는 것도 권장합니다. (예시: `.env.example`)

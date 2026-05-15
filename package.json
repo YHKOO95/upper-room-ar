@@ -12,12 +12,15 @@
   },
   "dependencies": {
     "@8thwall/engine-binary": "^1.0.0",
-    "@8thwall/landing-page": "^1.0.0",
     "@8thwall/xrextras": "^1.0.0",
     "@vitejs/plugin-basic-ssl": "latest",
+    "react": "^19.2.6",
+    "react-dom": "^19.2.6",
+    "react-router-dom": "^7.15.1",
     "vite": "latest"
   },
   "devDependencies": {
-    "@8thwall/image-target-cli": "^1.0.0"
+    "@8thwall/image-target-cli": "^1.0.0",
+    "@vitejs/plugin-react": "^6.0.2"
   }
 }
