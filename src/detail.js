@@ -1,7 +1,6 @@
 import './styles.css';
-import { findTargetBySlug, targets } from './targets.js';
-
-const TARGET_TOTAL = targets.length;
+import { findTargetBySlug } from './targets.js';
+import { TARGET_TOTAL, loadFoundIndices } from './lib/shared.js';
 
 const params = new URLSearchParams(window.location.search);
 const target = findTargetBySlug(params.get('target'));
@@ -15,16 +14,15 @@ if (target) {
 }
 
 function renderDetail(t) {
-  const foundRaw = localStorage.getItem('upper-room-ar-found');
-  const foundSet = new Set(foundRaw ? JSON.parse(foundRaw) : []);
+  const foundSet = loadFoundIndices();
   const foundCount = foundSet.size;
 
   root.innerHTML = `
-    <a class="back-link" href="index.html">
+    <a class="back-link" href="hub.html">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
         <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
       </svg>
-      AR 화면으로 돌아가기
+      허브로 돌아가기
     </a>
     <article class="detail-card">
       <div class="detail-eyebrow">AR OBJECT ${t.num}</div>
@@ -54,10 +52,10 @@ function renderDetail(t) {
     </article>
 
     <div class="detail-actions">
-      <a class="detail-btn-primary" href="index.html">
+      <a class="detail-btn-primary" href="${foundCount >= TARGET_TOTAL ? 'complete.html' : 'scan.html'}">
         ${foundCount >= TARGET_TOTAL ? '완성된 다락방 보기' : `다음 표식 찾기 (${foundCount}/${TARGET_TOTAL})`}
       </a>
-      <a class="detail-btn-ghost" href="index.html">AR 화면으로 돌아가기</a>
+      <a class="detail-btn-ghost" href="hub.html">허브로 돌아가기</a>
     </div>
   `;
 }
@@ -65,16 +63,16 @@ function renderDetail(t) {
 function renderNotFound() {
   document.title = '오브제를 찾을 수 없어요';
   root.innerHTML = `
-    <a class="back-link" href="index.html">
+    <a class="back-link" href="hub.html">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
         <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
       </svg>
-      AR 화면으로 돌아가기
+      허브로 돌아가기
     </a>
     <article class="detail-card">
       <div class="detail-eyebrow">AR OBJECT</div>
       <h1 class="detail-title">오브제를 찾을 수 없어요</h1>
-      <p class="detail-copy">다시 AR 화면에서 발견한 오브제를 눌러주세요.</p>
+      <p class="detail-copy">다시 스캔 화면에서 발견한 오브제를 눌러주세요.</p>
     </article>
   `;
 }

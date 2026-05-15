@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#000000" />
+  <title>새기기 | 비상수련회 AR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"/>
+</head>
+<body>
+
+<div id="app">
+  <div id="s-engrave" class="screen active">
+    <div class="stardust dim" id="dust-engrave"></div>
+    <div class="card-progress" id="cp-engrave"></div>
+    <div class="card-bar">
+      <a class="card-back" href="reflect.html">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+        뒤로
+      </a>
+      <span class="card-step-lbl">02 · ENGRAVE</span>
+    </div>
+    <h2 class="engrave-title">이름과 자리를 새겨주세요</h2>
+    <div class="card-preview-wrap" id="engrave-preview"></div>
+    <div class="engrave-inputs">
+      <label class="engrave-field">
+        <span class="mono-sm">NAME · 이름</span>
+        <input id="engrave-name" maxlength="14" placeholder="이름을 적어주세요" autocomplete="off"/>
+      </label>
+      <label class="engrave-field">
+        <span class="mono-sm">GROUP · 소속 조</span>
+        <input id="engrave-group" maxlength="14" placeholder="예: 다니엘 1조" autocomplete="off"/>
+      </label>
+    </div>
+    <div class="screen-bottom">
+      <button type="button" class="btn-primary" id="btn-engrave-next">봉인하러 가기 →</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="/src/entry-engrave.js"></script>
+</body>
+</html>

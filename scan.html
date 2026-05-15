@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#000000" />
+  <title>표식 스캔 | 비상수련회 AR</title>
+  <style>
+    #dev-insecure-context {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      padding: max(16px, env(safe-area-inset-top)) 20px 24px;
+      background: #1a0a0a;
+      color: #fff;
+      font-size: 15px;
+      line-height: 1.55;
+      border: 3px solid #f5c26b;
+      overflow: auto;
+      font-family: -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif;
+    }
+    #dev-insecure-context[hidden] { display: none !important; }
+    #dev-insecure-context strong { display: block; font-size: 1.1rem; margin-bottom: 12px; color: #ffe8b8; }
+    #dev-insecure-context p { margin-bottom: 12px; color: rgba(255,255,255,0.88); }
+    #dev-insecure-context .dev-insecure-code { font-family: ui-monospace, monospace; background: rgba(255,255,255,0.08); padding: 2px 6px; border-radius: 4px; }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css"/>
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@8thwall/xrextras@1/dist/xrextras.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@8thwall/landing-page@1/dist/landing-page.js" crossorigin="anonymous"></script>
+  <!--8THWALL_XR-->
+  <script>
+    (function () {
+      if (window.isSecureContext) return;
+      document.addEventListener('DOMContentLoaded', function () {
+        var el = document.getElementById('dev-insecure-context');
+        if (el) el.hidden = false;
+      });
+    })();
+  </script>
+</head>
+<body>
+
+<div id="dev-insecure-context" hidden>
+  <strong>HTTPS로 접속해 주세요</strong>
+  <p>카메라·8th Wall은 <code class="dev-insecure-code">https://</code>에서만 동작합니다.</p>
+</div>
+
+<div id="app">
+  <div id="s-scanner" class="screen transparent active">
+    <div class="scanner-bar">
+      <button type="button" class="icon-btn" id="btn-scan-back">←</button>
+      <span class="pill">SCANNING</span>
+    </div>
+    <div class="scan-status">
+      <span class="scan-status-pill" id="scan-status-text">표식을 찾는 중…</span>
+    </div>
+    <div class="viewfinder" id="viewfinder">
+      <div class="vf-tl"></div>
+      <div class="vf-tr"></div>
+      <div class="vf-br"></div>
+      <div class="vf-bl"></div>
+      <div class="vf-line"></div>
+    </div>
+    <div class="scan-hint">
+      <p class="mono-sm">HINT</p>
+      <p id="scan-hint-text">주위를 둘러보며 카메라를 표식에 천천히 맞춰주세요.</p>
+    </div>
+  </div>
+
+  <div id="s-revealed" class="screen transparent">
+    <div class="scanner-bar">
+      <button type="button" class="icon-btn" id="btn-reveal-close">✕</button>
+      <div class="scanner-bar-right">
+        <button type="button" class="icon-btn" id="btn-reveal-expand" aria-label="자세히 보기">↗</button>
+      </div>
+    </div>
+    <div class="reveal-caption">
+      <span class="pill" id="reveal-num-pill"></span>
+    </div>
+    <div class="reveal-card" id="reveal-card"></div>
+  </div>
+</div>
+
+<a-scene
+  id="ar-scene"
+  class="ar-active"
+  landing-page
+  xrextras-loading
+  xrextras-runtime-error
+  xrextras-gesture-detector
+  color-space="sRGB"
+  renderer="colorManagement: true; physicallyCorrectLights: true; alpha: true"
+  vr-mode-ui="enabled: false"
+  device-orientation-permission-ui="enabled: false"
+  cursor="rayOrigin: mouse; fuse: false"
+  raycaster="objects: .clickable, .cantap"
+  xrweb="disableWorldTracking: true"
+>
+  <a-camera
+    id="ar-camera"
+    position="0 0 0"
+    look-controls="enabled: false"
+    raycaster="objects: .clickable, .cantap"
+    cursor="fuse: false; rayOrigin: mouse"
+  ></a-camera>
+
+  <xrextras-named-image-target name="station-1-1" data-target-index="0">
+    <a-ring class="clickable" position="0 0 0" radius-inner="0.38" radius-outer="0.5" color="#facc15"
+      animation="property: rotation; to: 0 0 360; loop: true; dur: 6000"></a-ring>
+    <a-torus class="clickable" position="0 0 0.08" radius="0.28" radius-tubular="0.018" color="#38bdf8"
+      animation="property: rotation; to: 360 0 0; loop: true; dur: 4200"></a-torus>
+    <a-text value="빛의 문" align="center" position="0 -0.58 0.05" width="1.8" color="#ffffff"></a-text>
+  </xrextras-named-image-target>
+
+  <xrextras-named-image-target name="station-2-1" data-target-index="1">
+    <a-box class="clickable" position="0 0.04 0.04" depth="0.06" height="0.58" width="0.1" color="#e0f2fe"
+      animation="property: rotation; to: 0 360 0; loop: true; dur: 5000"></a-box>
+    <a-cone class="clickable" position="0 0.42 0.04" radius-bottom="0.11" height="0.22" color="#f8fafc"></a-cone>
+    <a-box class="clickable" position="0 -0.22 0.04" depth="0.07" height="0.08" width="0.38" color="#f59e0b"></a-box>
+    <a-text value="말씀의 검" align="center" position="0 -0.58 0.05" width="1.8" color="#ffffff"></a-text>
+  </xrextras-named-image-target>
+
+  <xrextras-named-image-target name="station-3-1" data-target-index="2">
+    <a-cone class="clickable" position="0 0.02 0.05" radius-bottom="0.22" height="0.48" color="#fb7185"
+      animation="property: scale; dir: alternate; to: 1.18 1.18 1.18; loop: true; dur: 850"></a-cone>
+    <a-cone class="clickable" position="0 0.04 0.1" radius-bottom="0.13" height="0.34" color="#fbbf24"
+      animation="property: scale; dir: alternate; to: 0.9 1.25 0.9; loop: true; dur: 700"></a-cone>
+    <a-text value="기도의 불씨" align="center" position="0 -0.58 0.05" width="1.8" color="#ffffff"></a-text>
+  </xrextras-named-image-target>
+
+  <xrextras-named-image-target name="station-4-1" data-target-index="3">
+    <a-cylinder class="clickable" position="-0.1 0.22 0.03" radius="0.025" height="0.7" color="#64748b"
+      animation="property: rotation; to: 0 0 2; dir: alternate; loop: true; dur: 2400; easing: easeInOutSine"></a-cylinder>
+    <a-sphere class="clickable" position="-0.1 0.6 0.03" radius="0.05" color="#F5C26B"></a-sphere>
+    <a-entity class="clickable" position="0.08 0.36 0.05"
+      animation="property: rotation; dir: alternate; to: 0 0 7; loop: true; dur: 1900; easing: easeInOutSine">
+      <a-plane width="0.46" height="0.32" color="#b91c1c" material="shader: flat; transparent: true; opacity: 0.94"></a-plane>
+      <a-plane position="0 0.05 0.004" width="0.46" height="0.07" color="#F5C26B" material="shader: flat; transparent: true; opacity: 0.92"></a-plane>
+    </a-entity>
+    <a-text value="어퍼룸 스카시 - 다니엘 9:23" align="center" position="0 -0.52 0.05" width="2.35" color="#ffffff"></a-text>
+    <a-text value="(기도의 능력)" align="center" position="0 -0.64 0.05" width="2" color="#F5C26B"></a-text>
+  </xrextras-named-image-target>
+</a-scene>
+
+<script type="module" src="/src/entry-scan.js"></script>
+</body>
+</html>

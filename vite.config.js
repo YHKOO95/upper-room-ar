@@ -1,6 +1,18 @@
 import basicSsl from '@vitejs/plugin-basic-ssl';
-import { resolve } from 'node:path';
+import { basename, resolve } from 'node:path';
 import { defineConfig, loadEnv } from 'vite';
+
+const rootPages = [
+  'index.html',
+  'perm.html',
+  'hub.html',
+  'scan.html',
+  'complete.html',
+  'reflect.html',
+  'engrave.html',
+  'seal.html',
+  'detail.html',
+];
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
@@ -10,27 +22,23 @@ export default defineConfig(({ mode }) => {
     ? `<script async crossorigin="anonymous" src="https://apps.8thwall.com/xrweb?appKey=${encodeURIComponent(appKey)}"></script>`
     : `<script async crossorigin="anonymous" src="https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1/dist/xr.js" data-preload-chunks="slam"></script>`;
 
+  const input = Object.fromEntries(rootPages.map((f) => [f.replace(/\./g, '_'), resolve(__dirname, f)]));
+
   return {
-    // 하위 경로 호스팅에서 /assets 404 방지
     base: './',
     plugins: [
       basicSsl(),
       {
         name: 'inject-8thwall-xr',
-        transformIndexHtml(html) {
+        transformIndexHtml(html, ctx) {
           const marker = '<!--8THWALL_XR-->';
           if (!html.includes(marker)) return html;
-          return html.replace(marker, xrScript);
+          return html.replace(marker, basename(ctx.filename) === 'scan.html' ? xrScript : '');
         },
       },
     ],
     build: {
-      rollupOptions: {
-        input: {
-          main: resolve(__dirname, 'index.html'),
-          detail: resolve(__dirname, 'detail.html'),
-        },
-      },
+      rollupOptions: { input },
     },
     server: {
       host: '0.0.0.0',

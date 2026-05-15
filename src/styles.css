@@ -242,6 +242,7 @@ body > video {
   gap: 6px;
   padding: 6px;
   -webkit-tap-highlight-color: transparent;
+  text-decoration: none;
 }
 .btn-ghost-row {
   text-align: center;

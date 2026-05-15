@@ -1,6 +1,6 @@
 /**
  * 역당 JSON·씬 타깃 개수. 1이면 `station-N-1`만 사용(인식 안정에 유리).
- * 늘리려면 `N-2` … 파일 + index.html 의 xrextras 블록도 같은 개수로 추가.
+ * 늘리려면 `N-2` … 파일 + `scan.html` 의 xrextras 블록도 같은 개수로 추가.
  */
 export const IMAGE_REFS_PER_STATION = 1;
 

@@ -11,6 +11,20 @@ npm run dev
 
 모바일 카메라는 HTTPS 환경에서만 안정적으로 동작합니다. 이 프로젝트는 개발 서버도 HTTPS로 실행되도록 설정되어 있습니다.
 
+## 화면(멀티 페이지) 흐름
+
+| 파일 | 역할 |
+|------|------|
+| `index.html` | 스플래시 |
+| `perm.html` | 카메라 안내 |
+| `hub.html` | 표식 목록·진행도 |
+| `scan.html` | **8th Wall + A-Frame** 스캔·발견 오버레이만 |
+| `detail.html?target=` | 오브제 상세 |
+| `complete.html` | 네 표식 완료 |
+| `reflect.html` → `engrave.html` → `seal.html` | 기념 카드 |
+
+발견한 표식은 `localStorage`(`upper-room-ar-found`), 카드 작성 중 데이터는 `sessionStorage`(`upper-room-ar-card`)에 둡니다.
+
 ## 이미지 타겟 준비
 
 1. 실물 표식 사진을 `public/targets/{역번호}-{참조번호}.png`(또는 `jpg`/`webp`)로 넣습니다. (`scripts/build-8th-targets.mjs`와 `src/targets.js`의 역·참조 개수와 맞춥니다.)
@@ -31,13 +45,13 @@ npm run gen:targets
 
 ## 구현 구조
 
-- `index.html`: 8th Wall XR + A-Frame 씬, `xrextras-named-image-target`별 3D 오브젝트
-- `src/main.js`: 8th Wall 이미지 타깃 로드, 트래킹 이벤트, 발견 상태 저장
+- `scan.html` + `src/entry-scan.js`: 8th Wall XR, 이미지 타깃, 스캔 UI
+- `src/entry-*.js`: 화면별 진입 스크립트
+- `src/lib/shared.js`: 공통(글리프, 카드 빌더, 저장소 헬퍼)
 - `src/targets.js`: 역 메타데이터·`station-N-M` 이름 규칙
-- `src/styles.css`: 모바일 우선 UI와 스캐닝 오버레이
+- `src/styles.css`: 모바일 우선 UI
 - `public/targets`: 원본 표식 이미지(빌드 입력)
 - `public/image-targets`: 8th Wall 이미지 타깃 산출물(빌드 출력)
-- `public/models`: GLB/GLTF 모델을 두는 위치
 
 ## 운영 체크리스트
 
